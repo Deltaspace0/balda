@@ -7,6 +7,7 @@ interface CanvasProps {
     onMouseMove?: (event: MouseEvent) => void;
     onMouseUp?: (event: MouseEvent) => void;
     onMouseDown?: (event: MouseEvent) => void;
+    onMouseLeave?: () => void;
   };
 }
 
@@ -43,6 +44,9 @@ function Canvas({ draw, className, mouseHandlers }: CanvasProps) {
     if (mouseHandlers?.onMouseUp) {
       canvas.addEventListener('mouseup', mouseHandlers.onMouseUp);
     }
+    if (mouseHandlers?.onMouseLeave) {
+      canvas.addEventListener('mouseleave', mouseHandlers.onMouseLeave);
+    }
     return () => {
       window.cancelAnimationFrame(animationFrameId);
       if (mouseHandlers?.onMouseMove) {
@@ -53,6 +57,9 @@ function Canvas({ draw, className, mouseHandlers }: CanvasProps) {
       }
       if (mouseHandlers?.onMouseUp) {
         canvas.removeEventListener('mouseup', mouseHandlers.onMouseUp);
+      }
+      if (mouseHandlers?.onMouseLeave) {
+        canvas.removeEventListener('mouseleave', mouseHandlers.onMouseLeave);
       }
     };
   }, [draw, mouseHandlers]);

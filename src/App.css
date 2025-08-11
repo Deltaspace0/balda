@@ -171,6 +171,21 @@ p {
   flex-direction: column;
 }
 
+.letter-row {
+  margin: 0 6px;
+}
+
+.letter {
+  margin: 0px;
+  width: 36px;
+}
+
+.letter-selected {
+  margin: 0px;
+  width: 36px;
+  background-color: #36335d;
+}
+
 .game-canvas {
   position: relative;
   width: 400px;
