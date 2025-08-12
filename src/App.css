@@ -148,12 +148,20 @@ button {
   }
 }
 
+li {
+  transition: color 0.3s ease-in-out;
+}
+
+li:hover {
+  color: #0ec3c9;
+  cursor: pointer;
+}
+
 .button-auto {
   width: auto;
 }
 
 p {
-  color: white;
   padding: 0 6px;
   margin: -10px 0;
 }
@@ -163,6 +171,7 @@ p {
   min-height: 100vh;
   display: flex;
   padding: 10px;
+  color: white;
 }
 
 .flex-center {

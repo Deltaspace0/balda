@@ -3,6 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 
 interface GameCallbacks {
   setAddingLetter: (status: boolean) => void;
+  setWordHistory: (wordHistory: [string, [number, number][]][]) => void;
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
@@ -12,6 +13,28 @@ function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: nu
   ctx.lineTo(x2-10*Math.cos(a-Math.PI/6), y2-10*Math.sin(a-Math.PI/6));
   ctx.moveTo(x2, y2);
   ctx.lineTo(x2-10*Math.cos(a+Math.PI/6), y2-10*Math.sin(a+Math.PI/6));
+}
+
+function drawPathArrows(ctx: CanvasRenderingContext2D, path: [number, number][], dw: number, dh: number) {
+  for (let i = 0; i < path.length-1; i++) {
+    const [row1, col1] = path[i];
+    const [row2, col2] = path[i+1];
+    let x1, y1, x2, y2;
+    if (row1 === row2) {
+      y1 = dh*(row1+0.5);
+      y2 = dh*(row2+0.5);
+      x1 = dw*(col1+(col1 > col2 ? 0.2 : 0.8));
+      x2 = dw*(col2+(col1 > col2 ? 0.8 : 0.2));
+    } else {
+      y1 = dh*(row1+(row1 > row2 ? 0.2 : 0.8));
+      y2 = dh*(row2+(row1 > row2 ? 0.8 : 0.2));
+      x1 = dw*(col1+0.5);
+      x2 = dw*(col2+0.5);
+    }
+    ctx.beginPath();
+    drawArrow(ctx, x1, y1, x2, y2);
+    ctx.stroke();
+  }
 }
 
 class Game {
@@ -25,7 +48,8 @@ class Game {
   private hoveredCell: [number, number] | null = null;
   private newCell: [number, number] | null = null;
   private wordPath: [number, number][] = [];
-  private wordHistory: string[] = [];
+  private wordHistory: [string, [number, number][]][] = [];
+  private highlightIndex: number | null = null;
 
   constructor(rows: number, cols: number, callbacks: GameCallbacks) {
     this.rows = rows;
@@ -42,6 +66,7 @@ class Game {
       this.wordHistory = JSON.parse(wordHistory);
     }
     this.callbacks.setAddingLetter(true);
+    this.callbacks.setWordHistory([...this.wordHistory]);
   }
 
   private getGridCoordinates(x: number, y: number) {
@@ -77,7 +102,7 @@ class Game {
     }
     const currentWord = this.balda.getWordFromPath(this.wordPath);
     let isDuplicate = false;
-    for (const word of this.wordHistory) {
+    for (const [word] of this.wordHistory) {
       if (word === currentWord) {
         isDuplicate = true;
         break;
@@ -87,7 +112,7 @@ class Game {
       this.wordPath = [];
       return;
     }
-    this.wordHistory.push(currentWord);
+    this.addWord(currentWord);
     this.setNewCell();
     this.update();
   }
@@ -104,11 +129,20 @@ class Game {
     this.selectingPath = false;
   }
 
+  private addWord(word?: string) {
+    if (word) {
+      this.wordHistory.push([word, [...this.wordPath]]);
+    } else {
+      this.wordHistory = [];
+    }
+    this.callbacks.setWordHistory([...this.wordHistory]);
+  }
+
   reset() {
     this.balda.reset();
     this.hoveredCell = null;
-    this.wordHistory = [];
     this.setNewCell();
+    this.addWord();
     this.update();
   }
 
@@ -119,6 +153,14 @@ class Game {
   setEditEnabled(enabled: boolean) {
     this.editEnabled = enabled;
     this.setNewCell();
+  }
+
+  setHighlightIndex(index?: number) {
+    if (index !== undefined) {
+      this.highlightIndex = index;
+      return;
+    }
+    this.highlightIndex = null;
   }
 
   cancelNewLetter() {
@@ -218,24 +260,9 @@ class Game {
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
     ctx.fillStyle = '#ffffff';
-    for (let i = 0; i < this.wordPath.length-1; i++) {
-      const [row1, col1] = this.wordPath[i];
-      const [row2, col2] = this.wordPath[i+1];
-      let x1, y1, x2, y2;
-      if (row1 === row2) {
-        y1 = dh*(row1+0.5);
-        y2 = dh*(row2+0.5);
-        x1 = dw*(col1+(col1 > col2 ? 0.2 : 0.8));
-        x2 = dw*(col2+(col1 > col2 ? 0.8 : 0.2));
-      } else {
-        y1 = dh*(row1+(row1 > row2 ? 0.2 : 0.8));
-        y2 = dh*(row2+(row1 > row2 ? 0.8 : 0.2));
-        x1 = dw*(col1+0.5);
-        x2 = dw*(col2+0.5);
-      }
-      ctx.beginPath();
-      drawArrow(ctx, x1, y1, x2, y2);
-      ctx.stroke();
+    drawPathArrows(ctx, this.wordPath, dw, dh);
+    if (this.highlightIndex !== null) {
+      drawPathArrows(ctx, this.wordHistory[this.highlightIndex][1], dw, dh);
     }
     for (let i = 0; i < this.rows+1; i++) {
       ctx.beginPath();
