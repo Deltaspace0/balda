@@ -40,6 +40,23 @@ class Balda {
       this.grid[y][i] = word[i];
     }
   }
+
+  checkWord(word: string): boolean {
+    for (const x of this.words) {
+      if (word === x) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  checkPath(path: [number, number][]): boolean {
+    let word = '';
+    for (const [row, col] of path) {
+      word += this.grid[row][col];
+    }
+    return this.checkWord(word);
+  }
 }
 
 export default Balda;

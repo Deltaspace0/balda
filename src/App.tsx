@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from 'react';
 
 function App() {
   const [letter, setLetter] = useState('а');
+  const [editEnabled, setEditEnabled] = useState(false);
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
     gameRef.current = new Game(5, 5);
@@ -18,12 +19,19 @@ function App() {
     game.setLetter(x);
     setLetter(x);
   }, [game]);
+  const handleEditEnabled = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    game.setEditEnabled(e.target.checked);
+    setEditEnabled(e.target.checked);
+  }, [game]);
   const mouseHandlers = {
     onMouseMove: useCallback((e: MouseEvent) => {
       game.mouseMove(e.offsetX, e.offsetY);
     }, [game]),
     onMouseDown: useCallback((e: MouseEvent) => {
       game.mouseDown(e.offsetX, e.offsetY);
+    }, [game]),
+    onMouseUp: useCallback(() => {
+      game.mouseUp();
     }, [game]),
     onMouseLeave: useCallback(() => {
       game.mouseLeave();
@@ -37,6 +45,10 @@ function App() {
       </div>
       <div className='flex-column'>
         <button onClick={() => game.reset()}>Reset game</button>
+        <label>
+          <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
+          <p>Edit mode</p>
+        </label>
       </div>
     </div>
   );
