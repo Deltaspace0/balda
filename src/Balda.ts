@@ -50,12 +50,16 @@ class Balda {
     return false;
   }
 
-  checkPath(path: [number, number][]): boolean {
+  getWordFromPath(path: [number, number][]): string {
     let word = '';
     for (const [row, col] of path) {
       word += this.grid[row][col];
     }
-    return this.checkWord(word);
+    return word;
+  }
+
+  checkPath(path: [number, number][]): boolean {
+    return this.checkWord(this.getWordFromPath(path));
   }
 }
 

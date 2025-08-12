@@ -25,16 +25,21 @@ class Game {
   private hoveredCell: [number, number] | null = null;
   private newCell: [number, number] | null = null;
   private wordPath: [number, number][] = [];
+  private wordHistory: string[] = [];
 
   constructor(rows: number, cols: number, callbacks: GameCallbacks) {
     this.rows = rows;
     this.cols = cols;
     this.callbacks = callbacks;
     const savedGrid = localStorage.getItem('balda-grid');
+    const wordHistory = localStorage.getItem('word-history');
     if (savedGrid) {
       this.balda = new Balda(rows, cols, JSON.parse(savedGrid));
     } else {
       this.balda = new Balda(rows, cols);
+    }
+    if (wordHistory) {
+      this.wordHistory = JSON.parse(wordHistory);
     }
     this.callbacks.setAddingLetter(true);
   }
@@ -45,12 +50,13 @@ class Game {
     return [row, col];
   }
 
-  private saveGrid() {
+  private saveState() {
     localStorage.setItem('balda-grid', JSON.stringify(this.balda.grid));
+    localStorage.setItem('word-history', JSON.stringify(this.wordHistory));
   }
 
   private update() {
-    this.saveGrid();
+    this.saveState();
   }
 
   private checkPath() {
@@ -65,11 +71,25 @@ class Game {
         break;
       }
     }
-    if (!includesNewCell || !this.balda.checkPath(this.wordPath)) {
+    if (!includesNewCell) {
       this.wordPath = [];
       return;
     }
+    const currentWord = this.balda.getWordFromPath(this.wordPath);
+    let isDuplicate = false;
+    for (const word of this.wordHistory) {
+      if (word === currentWord) {
+        isDuplicate = true;
+        break;
+      }
+    }
+    if (isDuplicate || !this.balda.checkWord(currentWord)) {
+      this.wordPath = [];
+      return;
+    }
+    this.wordHistory.push(currentWord);
     this.setNewCell();
+    this.update();
   }
 
   private setNewCell(newCell?: [number, number]) {
@@ -86,9 +106,8 @@ class Game {
 
   reset() {
     this.balda.reset();
-    this.selectingPath = false;
     this.hoveredCell = null;
-    this.wordPath = [];
+    this.wordHistory = [];
     this.setNewCell();
     this.update();
   }
