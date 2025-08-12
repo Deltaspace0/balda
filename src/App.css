@@ -148,6 +148,10 @@ button {
   }
 }
 
+.button-auto {
+  width: auto;
+}
+
 p {
   color: white;
   padding: 0 6px;

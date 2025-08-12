@@ -1,6 +1,10 @@
 import Balda from './Balda';
 import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 
+interface GameCallbacks {
+  setAddingLetter: (status: boolean) => void;
+}
+
 function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
   const a = Math.atan2(y2-y1, x2-x1);
   ctx.moveTo(x1, y1);
@@ -13,6 +17,7 @@ function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: nu
 class Game {
   private rows: number;
   private cols: number;
+  private callbacks: GameCallbacks;
   private balda: Balda;
   private letter: string = 'а';
   private editEnabled: boolean = false;
@@ -21,15 +26,17 @@ class Game {
   private newCell: [number, number] | null = null;
   private wordPath: [number, number][] = [];
 
-  constructor(rows: number, cols: number) {
+  constructor(rows: number, cols: number, callbacks: GameCallbacks) {
     this.rows = rows;
     this.cols = cols;
+    this.callbacks = callbacks;
     const savedGrid = localStorage.getItem('balda-grid');
     if (savedGrid) {
       this.balda = new Balda(rows, cols, JSON.parse(savedGrid));
     } else {
       this.balda = new Balda(rows, cols);
     }
+    this.callbacks.setAddingLetter(true);
   }
 
   private getGridCoordinates(x: number, y: number) {
@@ -62,16 +69,27 @@ class Game {
       this.wordPath = [];
       return;
     }
-    this.wordPath = [];
+    this.setNewCell();
+  }
+
+  private setNewCell(newCell?: [number, number]) {
+    if (newCell) {
+      this.newCell = newCell;
+      this.callbacks.setAddingLetter(false);
+      return;
+    }
+    this.callbacks.setAddingLetter(true);
     this.newCell = null;
+    this.wordPath = [];
+    this.selectingPath = false;
   }
 
   reset() {
     this.balda.reset();
     this.selectingPath = false;
     this.hoveredCell = null;
-    this.newCell = null;
     this.wordPath = [];
+    this.setNewCell();
     this.update();
   }
 
@@ -81,11 +99,16 @@ class Game {
 
   setEditEnabled(enabled: boolean) {
     this.editEnabled = enabled;
-    if (enabled) {
-      this.selectingPath = false;
-      this.newCell = null;
-      this.wordPath = [];
+    this.setNewCell();
+  }
+
+  cancelNewLetter() {
+    if (!this.newCell) {
+      return;
     }
+    const [newRow, newCol] = this.newCell;
+    this.balda.grid[newRow][newCol] = '';
+    this.setNewCell();
   }
 
   mouseMove(x: number, y: number) {
@@ -133,7 +156,7 @@ class Game {
     }
     if (currentLetter === '') {
       this.balda.grid[row][col] = this.letter;
-      this.newCell = [row, col];
+      this.setNewCell([row, col]);
     }
   }
 

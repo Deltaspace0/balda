@@ -7,9 +7,13 @@ import { useCallback, useRef, useState } from 'react';
 function App() {
   const [letter, setLetter] = useState('а');
   const [editEnabled, setEditEnabled] = useState(false);
+  const [addingLetter, setAddingLetter] = useState(true);
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
-    gameRef.current = new Game(5, 5);
+    const callbacks = {
+      setAddingLetter: setAddingLetter
+    };
+    gameRef.current = new Game(5, 5, callbacks);
   }
   const game = gameRef.current;
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -45,6 +49,13 @@ function App() {
       </div>
       <div className='flex-column'>
         <button onClick={() => game.reset()}>Reset game</button>
+        <label>
+          <button
+            className='button-auto'
+            disabled={addingLetter}
+            onClick={() => game.cancelNewLetter()}>Cancel</button>
+          <p>{addingLetter ? 'Add letter' : 'Select word path'}</p>
+        </label>
         <label>
           <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
           <p>Edit mode</p>
