@@ -184,6 +184,9 @@ class Game {
       for (let i = this.wordPath.length-1; i >= 0; i--) {
         const [cellRow, cellCol] = this.wordPath[i];
         if (row === cellRow && col === cellCol) {
+          if (i === this.wordPath.length-2) {
+            this.wordPath.pop();
+          }
           return;
         }
       }
