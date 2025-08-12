@@ -82,6 +82,7 @@ class Game {
 
   private update() {
     this.saveState();
+    this.balda.update();
   }
 
   private checkPath() {
@@ -101,11 +102,13 @@ class Game {
       return;
     }
     const currentWord = this.balda.getWordFromPath(this.wordPath);
-    let isDuplicate = false;
-    for (const [word] of this.wordHistory) {
-      if (word === currentWord) {
-        isDuplicate = true;
-        break;
+    let isDuplicate = currentWord === this.balda.getInitWord();
+    if (!isDuplicate) {
+      for (const [word] of this.wordHistory) {
+        if (word === currentWord) {
+          isDuplicate = true;
+          break;
+        }
       }
     }
     if (isDuplicate || !this.balda.checkWord(currentWord)) {

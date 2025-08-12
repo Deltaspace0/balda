@@ -4,6 +4,7 @@ class Balda {
   private cols: number;
   private words: string[] = [];
   private initWords: string[] = [];
+  private initWord: string = '';
 
   constructor(rows: number, cols: number, grid?: string[][]) {
     this.rows = rows;
@@ -39,6 +40,18 @@ class Balda {
     for (let i = 0; i < this.cols; i++) {
       this.grid[y][i] = word[i];
     }
+  }
+
+  update() {
+    this.initWord = '';
+    const y = Math.floor(this.rows/2);
+    for (let i = 0; i < this.cols; i++) {
+      this.initWord += this.grid[y][i];
+    }
+  }
+
+  getInitWord(): string {
+    return this.initWord;
   }
 
   checkWord(word: string): boolean {
