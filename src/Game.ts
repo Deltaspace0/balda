@@ -185,6 +185,17 @@ class Game {
     this.possibleIndex = null;
   }
 
+  selectPossibleWord(index: number) {
+    const [word, path] = this.balda.possibleWords[index];
+    for (let i = 0; i < word.length; i++) {
+      const [row, col] = path[i];
+      this.balda.grid[row][col] = word[i];
+    }
+    this.wordHistory.push([word, path]);
+    this.callbacks.setWordHistory([...this.wordHistory]);
+    this.update();
+  }
+
   cancelNewLetter() {
     if (!this.newCell) {
       return;
@@ -290,15 +301,17 @@ class Game {
       drawPathArrows(ctx, this.wordHistory[this.highlightIndex][1], dw, dh);
     }
     if (this.possibleIndex !== null) {
-      const [word, path] = this.balda.possibleWords[this.possibleIndex];
-      for (let i = 0; i < word.length; i++) {
-        const [row, col] = path[i];
-        if (this.balda.grid[row][col] === '') {
-          ctx.fillText(word[i], dw*(col+0.5), dh*(row+0.5));
-          break;
+      if (this.possibleIndex < this.balda.possibleWords.length) {
+        const [word, path] = this.balda.possibleWords[this.possibleIndex];
+        for (let i = 0; i < word.length; i++) {
+          const [row, col] = path[i];
+          if (this.balda.grid[row][col] === '') {
+            ctx.fillText(word[i], dw*(col+0.5), dh*(row+0.5));
+            break;
+          }
         }
+        drawPathArrows(ctx, path, dw, dh);
       }
-      drawPathArrows(ctx, path, dw, dh);
     }
     for (let i = 0; i < this.rows+1; i++) {
       ctx.beginPath();

@@ -69,6 +69,7 @@ function App() {
           label='Possible words'
           wordPaths={possibleWords}
           setHighlightIndex={(i) => game.setPossibleIndex(i)}
+          onClick={(i) => game.selectPossibleWord(i)}
         />
         <WordList
           label='Word history'
