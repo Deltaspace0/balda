@@ -148,6 +148,13 @@ button {
   }
 }
 
+fieldset {
+  margin: 6px;
+  min-width: 240px;
+  max-height: 240px;
+  overflow: auto;
+}
+
 li {
   transition: color 0.3s ease-in-out;
 }

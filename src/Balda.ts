@@ -1,8 +1,13 @@
+interface Dictionary {
+  [key: string]: Dictionary
+}
+
 class Balda {
   grid: string[][];
+  possibleWords: [string, [number, number][]][] = [];
   private rows: number;
   private cols: number;
-  private words: string[] = [];
+  private dictionary: Dictionary = {};
   private initWords: string[] = [];
   private initWord: string = '';
 
@@ -20,13 +25,106 @@ class Balda {
     fetch('/nouns.txt')
       .then(response => response.text())
       .then(text => {
-        this.words = text.split(/\r?\n/).map(x => x.trim().toLowerCase());
-        for (const word of this.words) {
+        const words = text.split(/\r?\n/).map(x => x.trim().toLowerCase());
+        for (const word of words) {
           if (word.length === this.cols) {
             this.initWords.push(word);
           }
+          this.addWord(word);
         }
       });
+  }
+
+  private addWord(word: string) {
+    let dictionary = this.dictionary;
+    for (const letter of word) {
+      if (!(letter in dictionary)) {
+        dictionary[letter] = {};
+      }
+      dictionary = dictionary[letter];
+    }
+    dictionary[''] = {};
+  }
+
+  private addPossibleWord(word: string, path: [number, number][]) {
+    for (const x of this.possibleWords) {
+      if (x[0] === word) {
+        return;
+      }
+    }
+    this.possibleWords.push([word, path]);
+  }
+
+  private getNeighborCells(row: number, col: number): [number, number][] {
+    const neighborCells: [number, number][] = [];
+    if (col > 0) {
+      neighborCells.push([row, col-1]);
+    }
+    if (col < this.cols-1) {
+      neighborCells.push([row, col+1]);
+    }
+    if (row > 0) {
+      neighborCells.push([row-1, col]);
+    }
+    if (row < this.rows-1) {
+      neighborCells.push([row+1, col]);
+    }
+    return neighborCells;
+  }
+
+  private generatePossibleWordsFromPath(path: [number, number][], dictionary: Dictionary, addedNewLetter: boolean) {
+    const [lastRow, lastCol] = path[path.length-1];
+    if (addedNewLetter && ('' in dictionary)) {
+      this.addPossibleWord(this.getWordFromPath(path), path);
+    }
+    const lastLetter = this.grid[lastRow][lastCol];
+    if (lastLetter === '') {
+      for (const nextLetter in dictionary) {
+        if (nextLetter === '') {
+          continue;
+        }
+        this.grid[lastRow][lastCol] = nextLetter;
+        this.generatePossibleWordsFromPath([...path], dictionary[nextLetter], true);
+      }
+      this.grid[lastRow][lastCol] = '';
+      return;
+    }
+    for (const [row, col] of this.getNeighborCells(lastRow, lastCol)) {
+      let visited = false;
+      for (const [prevRow, prevCol] of path) {
+        if (row === prevRow && col === prevCol) {
+          visited = true;
+          break;
+        }
+      }
+      if (visited) {
+        continue;
+      }
+      const letter = this.grid[row][col];
+      if (letter === '' && addedNewLetter) {
+        continue;
+      }
+      if (letter !== '' && !(letter in dictionary)) {
+        continue;
+      }
+      const nextPath: [number, number][] = [...path, [row, col]];
+      const nextDictionary = letter === '' ? dictionary : dictionary[letter];
+      this.generatePossibleWordsFromPath(nextPath, nextDictionary, addedNewLetter);
+    }
+  }
+
+  private generatePossibleWords() {
+    this.possibleWords = [];
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const l = this.grid[i][j];
+        if (l !== '' && !(l in this.dictionary)) {
+          continue;
+        }
+        const dictionary = l === '' ? this.dictionary : this.dictionary[l];
+        this.generatePossibleWordsFromPath([[i, j]], dictionary, false);
+      }
+    }
   }
 
   reset() {
@@ -48,6 +146,7 @@ class Balda {
     for (let i = 0; i < this.cols; i++) {
       this.initWord += this.grid[y][i];
     }
+    this.generatePossibleWords();
   }
 
   getInitWord(): string {
@@ -55,12 +154,14 @@ class Balda {
   }
 
   checkWord(word: string): boolean {
-    for (const x of this.words) {
-      if (word === x) {
-        return true;
+    let dictionary = this.dictionary;
+    for (const letter of word) {
+      if (!(letter in dictionary)) {
+        return false;
       }
+      dictionary = dictionary[letter];
     }
-    return false;
+    return ('' in dictionary);
   }
 
   getWordFromPath(path: [number, number][]): string {

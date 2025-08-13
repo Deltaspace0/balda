@@ -1,6 +1,6 @@
 import './App.css';
 import Canvas from './components/Canvas';
-import HistoryPanel from './components/HistoryPanel';
+import WordList from './components/WordList';
 import LetterPanel from './components/LetterPanel';
 import Game from './Game';
 import { useCallback, useRef, useState } from 'react';
@@ -10,11 +10,13 @@ function App() {
   const [editEnabled, setEditEnabled] = useState(false);
   const [addingLetter, setAddingLetter] = useState(true);
   const [wordHistory, setWordHistory] = useState<[string, [number, number][]][]>([]);
+  const [possibleWords, setPossibleWords] = useState<[string, [number, number][]][]>([]);
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
     const callbacks = {
       setAddingLetter: setAddingLetter,
-      setWordHistory: setWordHistory
+      setWordHistory: setWordHistory,
+      setPossibleWords: setPossibleWords
     };
     gameRef.current = new Game(5, 5, callbacks);
   }
@@ -63,7 +65,16 @@ function App() {
           <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
           <p>Edit mode</p>
         </label>
-        <HistoryPanel wordHistory={wordHistory} setHighlightIndex={(i) => game.setHighlightIndex(i)}/>
+        <WordList
+          label='Possible words'
+          wordPaths={possibleWords}
+          setHighlightIndex={(i) => game.setPossibleIndex(i)}
+        />
+        <WordList
+          label='Word history'
+          wordPaths={wordHistory}
+          setHighlightIndex={(i) => game.setHighlightIndex(i)}
+        />
       </div>
     </div>
   );

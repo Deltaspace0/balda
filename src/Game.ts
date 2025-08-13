@@ -4,6 +4,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 interface GameCallbacks {
   setAddingLetter: (status: boolean) => void;
   setWordHistory: (wordHistory: [string, [number, number][]][]) => void;
+  setPossibleWords: (possibleWords: [string, [number, number][]][]) => void;
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
@@ -50,6 +51,7 @@ class Game {
   private wordPath: [number, number][] = [];
   private wordHistory: [string, [number, number][]][] = [];
   private highlightIndex: number | null = null;
+  private possibleIndex: number | null = null;
 
   constructor(rows: number, cols: number, callbacks: GameCallbacks) {
     this.rows = rows;
@@ -67,6 +69,7 @@ class Game {
     }
     this.callbacks.setAddingLetter(true);
     this.callbacks.setWordHistory([...this.wordHistory]);
+    setTimeout(() => this.update(), 100);
   }
 
   private getGridCoordinates(x: number, y: number) {
@@ -83,6 +86,23 @@ class Game {
   private update() {
     this.saveState();
     this.balda.update();
+    const possibleWords = this.balda.possibleWords
+      .filter((x) => this.checkWord(x[0]))
+      .sort(([word1], [word2]) => word2.length-word1.length);
+    this.balda.possibleWords = possibleWords;
+    this.callbacks.setPossibleWords([...possibleWords]);
+  }
+
+  private checkWord(word: string): boolean {
+    if (word === this.balda.getInitWord()) {
+      return false;
+    }
+    for (const [prevWord] of this.wordHistory) {
+      if (prevWord === word) {
+        return false;
+      }
+    }
+    return this.balda.checkWord(word);
   }
 
   private checkPath() {
@@ -101,21 +121,12 @@ class Game {
       this.wordPath = [];
       return;
     }
-    const currentWord = this.balda.getWordFromPath(this.wordPath);
-    let isDuplicate = currentWord === this.balda.getInitWord();
-    if (!isDuplicate) {
-      for (const [word] of this.wordHistory) {
-        if (word === currentWord) {
-          isDuplicate = true;
-          break;
-        }
-      }
-    }
-    if (isDuplicate || !this.balda.checkWord(currentWord)) {
+    const word = this.balda.getWordFromPath(this.wordPath);
+    if (!this.checkWord(word)) {
       this.wordPath = [];
       return;
     }
-    this.addWord(currentWord);
+    this.addWord(word);
     this.setNewCell();
     this.update();
   }
@@ -164,6 +175,14 @@ class Game {
       return;
     }
     this.highlightIndex = null;
+  }
+
+  setPossibleIndex(index?: number) {
+    if (index !== undefined) {
+      this.possibleIndex = index;
+      return;
+    }
+    this.possibleIndex = null;
   }
 
   cancelNewLetter() {
@@ -269,6 +288,17 @@ class Game {
     drawPathArrows(ctx, this.wordPath, dw, dh);
     if (this.highlightIndex !== null) {
       drawPathArrows(ctx, this.wordHistory[this.highlightIndex][1], dw, dh);
+    }
+    if (this.possibleIndex !== null) {
+      const [word, path] = this.balda.possibleWords[this.possibleIndex];
+      for (let i = 0; i < word.length; i++) {
+        const [row, col] = path[i];
+        if (this.balda.grid[row][col] === '') {
+          ctx.fillText(word[i], dw*(col+0.5), dh*(row+0.5));
+          break;
+        }
+      }
+      drawPathArrows(ctx, path, dw, dh);
     }
     for (let i = 0; i < this.rows+1; i++) {
       ctx.beginPath();
