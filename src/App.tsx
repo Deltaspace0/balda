@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from 'react';
 function App() {
   const [letter, setLetter] = useState('а');
   const [editEnabled, setEditEnabled] = useState(false);
+  const [showPossible, setShowPossible] = useState(true);
   const [addingLetter, setAddingLetter] = useState(true);
   const [wordHistory, setWordHistory] = useState<[string, [number, number][]][]>([]);
   const [possibleWords, setPossibleWords] = useState<[string, [number, number][]][]>([]);
@@ -65,12 +66,16 @@ function App() {
           <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
           <p>Edit mode</p>
         </label>
-        <WordList
+        <label>
+          <input type='checkbox' checked={showPossible} onChange={(e) => setShowPossible(e.target.checked)}/>
+          <p>Show possible words</p>
+        </label>
+        {showPossible && <WordList
           label='Possible words'
           wordPaths={possibleWords}
           setHighlightIndex={(i) => game.setPossibleIndex(i)}
           onClick={(i) => game.selectPossibleWord(i)}
-        />
+        />}
         <WordList
           label='Word history'
           wordPaths={wordHistory}
