@@ -79,10 +79,6 @@ function App() {
     <div className='App'>
       <div className='flex-column'>
         <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
-        <LetterPanel letter={letter} setLetter={handleLetter}/>
-      </div>
-      <div className='flex-column'>
-        <button onClick={() => game.reset()}>Reset game</button>
         <label>
           <button
             className='button-auto'
@@ -90,6 +86,10 @@ function App() {
             onClick={() => game.cancelNewLetter()}>Cancel</button>
           <p>{addingLetter ? 'Add letter' : 'Select word path'}</p>
         </label>
+        <LetterPanel letter={letter} setLetter={handleLetter}/>
+      </div>
+      <div className='flex-column'>
+        <button onClick={() => game.reset()}>Reset game</button>
         <label>
           <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
           <p>Edit mode</p>
@@ -106,7 +106,10 @@ function App() {
           label='Possible words'
           wordPaths={possibleWords}
           setHighlightIndex={(i) => game.setPossibleIndex(i)}
-          onClick={(i) => game.selectPossibleWord(i)}
+          onClick={(i) => {
+            game.selectPossibleWord(i);
+            game.setPossibleIndex();
+          }}
         />}
       </div>
       {twoPlayersMode ? (
