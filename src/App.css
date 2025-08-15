@@ -173,6 +173,10 @@ p {
   margin: -10px 0;
 }
 
+.status {
+  margin: 8px;
+}
+
 .App {
   background-color: #282c34;
   min-height: 100vh;

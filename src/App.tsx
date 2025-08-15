@@ -13,7 +13,7 @@ function App() {
   const [editEnabled, setEditEnabled] = useState(false);
   const [twoPlayersMode, setTwoPlayersMode] = useState(false);
   const [showPossible, setShowPossible] = useState(true);
-  const [addingLetter, setAddingLetter] = useState(true);
+  const [status, setStatus] = useState('add-letter');
   const [wordHistory, setWordHistory] = useState<WordPaths>([]);
   const [wordHistory1, setWordHistory1] = useState<WordPaths>([]);
   const [wordHistory2, setWordHistory2] = useState<WordPaths>([]);
@@ -58,7 +58,7 @@ function App() {
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
     const callbacks = {
-      setAddingLetter: setAddingLetter,
+      setStatus: setStatus,
       setWordHistory: handleWordHistory,
       setPossibleWords: setPossibleWords
     };
@@ -93,17 +93,6 @@ function App() {
   return (
     <div className='App'>
       <div className='flex-column'>
-        <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
-        <label>
-          <button
-            className='button-auto'
-            disabled={addingLetter}
-            onClick={() => game.cancelNewLetter()}>Cancel</button>
-          <p>{addingLetter ? 'Add letter' : 'Select word path'}</p>
-        </label>
-        <LetterPanel letter={letter} setLetter={handleLetter}/>
-      </div>
-      <div className='flex-column'>
         <button onClick={() => game.reset(rows, cols)}>Reset game</button>
         <Slider {...rowProps}/>
         <Slider {...colProps}/>
@@ -129,7 +118,23 @@ function App() {
           }}
         />}
       </div>
-      {twoPlayersMode ? (
+      <div className='flex-column'>
+        <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
+        <LetterPanel letter={letter} setLetter={handleLetter}/>
+        { status === 'add-letter' && <p className='status'>Add letter</p> }
+        { status === 'select-path' &&
+            <label>
+              <button className='button-auto' onClick={() => game.cancelNewLetter()}>Cancel</button>
+              <p>Select word path</p>
+            </label> }
+        { status === 'unknown-word' &&
+            <div>
+              <button className='button-auto' onClick={() => game.resolveUnknownWord(true)}>Add</button>
+              <button className='button-auto' onClick={() => game.resolveUnknownWord(false)}>Cancel</button>
+              <p className='status'>Unknown word: {game.getUnknownWord()}. Add it anyway?</p>
+            </div> }
+      </div>
+      { twoPlayersMode ? (
         <>
           <WordList
             label={`Player 1: ${score1}`}
@@ -152,7 +157,7 @@ function App() {
           wordPaths={wordHistory}
           setHighlightIndex={(i) => game.setHighlightIndex(i)}
         />
-      )}
+      ) }
     </div>
   );
 }

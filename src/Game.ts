@@ -2,7 +2,7 @@ import Balda from './Balda';
 import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 
 interface GameCallbacks {
-  setAddingLetter: (status: boolean) => void;
+  setStatus: (status: string) => void;
   setWordHistory: (wordHistory: [string, [number, number][]][]) => void;
   setPossibleWords: (possibleWords: [string, [number, number][]][]) => void;
 }
@@ -46,6 +46,7 @@ class Game {
   private letter: string = 'а';
   private editEnabled: boolean = false;
   private selectingPath: boolean = false;
+  private unknownWord: string | null = null;
   private hoveredCell: [number, number] | null = null;
   private newCell: [number, number] | null = null;
   private wordPath: [number, number][] = [];
@@ -70,13 +71,13 @@ class Game {
   private update() {
     this.balda.update();
     const possibleWords = this.balda.possibleWords
-      .filter((x) => this.checkWord(x[0]))
+      .filter((x) => this.isUnique(x[0]))
       .sort(([word1], [word2]) => word2.length-word1.length);
     this.balda.possibleWords = possibleWords;
     this.callbacks.setPossibleWords([...possibleWords]);
   }
 
-  private checkWord(word: string): boolean {
+  private isUnique(word: string): boolean {
     if (word === this.balda.getInitWord()) {
       return false;
     }
@@ -85,7 +86,7 @@ class Game {
         return false;
       }
     }
-    return this.balda.checkWord(word);
+    return true;
   }
 
   private checkPath() {
@@ -100,13 +101,18 @@ class Game {
         break;
       }
     }
-    if (!includesNewCell) {
+    if (!includesNewCell || this.wordPath.length === 1) {
       this.wordPath = [];
       return;
     }
     const word = this.balda.getWordFromPath(this.wordPath);
-    if (!this.checkWord(word)) {
+    if (!this.isUnique(word)) {
       this.wordPath = [];
+      return;
+    }
+    if (!this.balda.checkWord(word)) {
+      this.unknownWord = word;
+      this.callbacks.setStatus('unknown-word');
       return;
     }
     this.addWord(word);
@@ -117,10 +123,10 @@ class Game {
   private setNewCell(newCell?: [number, number]) {
     if (newCell) {
       this.newCell = newCell;
-      this.callbacks.setAddingLetter(false);
+      this.callbacks.setStatus('select-path');
       return;
     }
-    this.callbacks.setAddingLetter(true);
+    this.callbacks.setStatus('add-letter');
     this.newCell = null;
     this.wordPath = [];
     this.selectingPath = false;
@@ -147,6 +153,10 @@ class Game {
     this.setNewCell();
     this.addWord();
     this.update();
+  }
+
+  getUnknownWord(): string | null {
+    return this.unknownWord;
   }
 
   setLetter(letter: string) {
@@ -194,6 +204,21 @@ class Game {
     this.setNewCell();
   }
 
+  resolveUnknownWord(isGood: boolean) {
+    if (this.unknownWord === null) {
+      return;
+    }
+    if (isGood) {
+      this.addWord(this.unknownWord);
+      this.setNewCell();
+      this.update();
+    } else {
+      this.wordPath = [];
+      this.callbacks.setStatus('select-path');
+    }
+    this.unknownWord = null;
+  }
+
   mouseMove(x: number, y: number) {
     const [row, col] = this.getGridCoordinates(x, y);
     if (this.selectingPath) {
@@ -233,7 +258,7 @@ class Game {
       return;
     }
     if (this.newCell) {
-      if (currentLetter === '') {
+      if (currentLetter === '' || this.unknownWord !== null) {
         return;
       }
       this.selectingPath = true;
