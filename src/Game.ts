@@ -57,19 +57,8 @@ class Game {
     this.rows = rows;
     this.cols = cols;
     this.callbacks = callbacks;
-    const savedGrid = localStorage.getItem('balda-grid');
-    const wordHistory = localStorage.getItem('word-history');
-    if (savedGrid) {
-      this.balda = new Balda(rows, cols, JSON.parse(savedGrid));
-    } else {
-      this.balda = new Balda(rows, cols);
-    }
-    if (wordHistory) {
-      this.wordHistory = JSON.parse(wordHistory);
-    }
-    this.callbacks.setAddingLetter(true);
-    this.callbacks.setWordHistory([...this.wordHistory]);
-    setTimeout(() => this.update(), 100);
+    this.balda = new Balda(rows, cols);
+    this.balda.loadDictionary('/nouns.txt').then(() => this.reset());
   }
 
   private getGridCoordinates(x: number, y: number) {
@@ -78,13 +67,7 @@ class Game {
     return [row, col];
   }
 
-  private saveState() {
-    localStorage.setItem('balda-grid', JSON.stringify(this.balda.grid));
-    localStorage.setItem('word-history', JSON.stringify(this.wordHistory));
-  }
-
   private update() {
-    this.saveState();
     this.balda.update();
     const possibleWords = this.balda.possibleWords
       .filter((x) => this.checkWord(x[0]))

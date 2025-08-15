@@ -22,17 +22,6 @@ class Balda {
         this.grid.push(Array(cols).fill(''));
       }
     }
-    fetch('/nouns.txt')
-      .then(response => response.text())
-      .then(text => {
-        const words = text.split(/\r?\n/).map(x => x.trim().toLowerCase());
-        for (const word of words) {
-          if (word.length === this.cols) {
-            this.initWords.push(word);
-          }
-          this.addWord(word);
-        }
-      });
   }
 
   private addWord(word: string) {
@@ -127,11 +116,26 @@ class Balda {
     }
   }
 
+  async loadDictionary(path: string) {
+    const response = await fetch(path);
+    const text = await response.text();
+    const words = text.split(/\r?\n/).map(x => x.trim().toLowerCase());
+    for (const word of words) {
+      if (word.length === this.cols) {
+        this.initWords.push(word);
+      }
+      this.addWord(word);
+    }
+  }
+
   reset() {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         this.grid[i][j] = '';
       }
+    }
+    if (this.initWords.length === 0) {
+      return;
     }
     const word = this.initWords[Math.floor(Math.random()*this.initWords.length)];
     const y = Math.floor(this.rows/2);
