@@ -5,18 +5,46 @@ import LetterPanel from './components/LetterPanel';
 import Game from './Game';
 import { useCallback, useRef, useState } from 'react';
 
+type WordPaths = [string, [number, number][]][];
+
 function App() {
   const [letter, setLetter] = useState('а');
   const [editEnabled, setEditEnabled] = useState(false);
+  const [twoPlayersMode, setTwoPlayersMode] = useState(false);
   const [showPossible, setShowPossible] = useState(true);
   const [addingLetter, setAddingLetter] = useState(true);
-  const [wordHistory, setWordHistory] = useState<[string, [number, number][]][]>([]);
-  const [possibleWords, setPossibleWords] = useState<[string, [number, number][]][]>([]);
+  const [wordHistory, setWordHistory] = useState<WordPaths>([]);
+  const [wordHistory1, setWordHistory1] = useState<WordPaths>([]);
+  const [wordHistory2, setWordHistory2] = useState<WordPaths>([]);
+  const [score1, setScore1] = useState(0);
+  const [score2, setScore2] = useState(0);
+  const [possibleWords, setPossibleWords] = useState<WordPaths>([]);
+  const handleWordHistory = (newWordHistory: WordPaths) => {
+    setWordHistory(newWordHistory);
+    const newWordHistory1: WordPaths = [];
+    const newWordHistory2: WordPaths = [];
+    let newScore1 = 0;
+    let newScore2 = 0;
+    for (let i = 0; i < newWordHistory.length; i++) {
+      const [word, path] = newWordHistory[i];
+      if (i%2 === 0) {
+        newWordHistory1.push([word, path]);
+        newScore1 += word.length;
+      } else {
+        newWordHistory2.push([word, path]);
+        newScore2 += word.length;
+      }
+    }
+    setWordHistory1(newWordHistory1);
+    setWordHistory2(newWordHistory2);
+    setScore1(newScore1);
+    setScore2(newScore2);
+  };
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
     const callbacks = {
       setAddingLetter: setAddingLetter,
-      setWordHistory: setWordHistory,
+      setWordHistory: handleWordHistory,
       setPossibleWords: setPossibleWords
     };
     gameRef.current = new Game(5, 5, callbacks);
@@ -67,6 +95,10 @@ function App() {
           <p>Edit mode</p>
         </label>
         <label>
+          <input type='checkbox' checked={twoPlayersMode} onChange={(e) => setTwoPlayersMode(e.target.checked)}/>
+          <p>Two players</p>
+        </label>
+        <label>
           <input type='checkbox' checked={showPossible} onChange={(e) => setShowPossible(e.target.checked)}/>
           <p>Show possible words</p>
         </label>
@@ -76,12 +108,31 @@ function App() {
           setHighlightIndex={(i) => game.setPossibleIndex(i)}
           onClick={(i) => game.selectPossibleWord(i)}
         />}
+      </div>
+      {twoPlayersMode ? (
+        <>
+          <WordList
+            label={`Player 1: ${score1}`}
+            wordPaths={wordHistory1}
+            setHighlightIndex={(i) => {
+              game.setHighlightIndex(i !== undefined ? i*2 : i);
+            }}
+          />
+          <WordList
+            label={`Player 2: ${score2}`}
+            wordPaths={wordHistory2}
+            setHighlightIndex={(i) => {
+              game.setHighlightIndex(i !== undefined ? i*2+1 : i);
+            }}
+          />
+        </>
+      ) : (
         <WordList
           label='Word history'
           wordPaths={wordHistory}
           setHighlightIndex={(i) => game.setHighlightIndex(i)}
         />
-      </div>
+      )}
     </div>
   );
 }
