@@ -51,6 +51,7 @@ class Game {
   private newCell: [number, number] | null = null;
   private wordPath: [number, number][] = [];
   private wordHistory: [string, [number, number][]][] = [];
+  private cellHistory: [number, number][] = [];
   private highlightIndex: number | null = null;
   private possibleIndex: number | null = null;
 
@@ -135,8 +136,12 @@ class Game {
   private addWord(word?: string) {
     if (word) {
       this.wordHistory.push([word, [...this.wordPath]]);
+      if (this.newCell !== null) {
+        this.cellHistory.push(this.newCell);
+      }
     } else {
       this.wordHistory = [];
+      this.cellHistory = [];
     }
     this.callbacks.setWordHistory([...this.wordHistory]);
   }
@@ -152,6 +157,17 @@ class Game {
     this.hoveredCell = null;
     this.setNewCell();
     this.addWord();
+    this.update();
+  }
+
+  undo() {
+    this.wordHistory.pop();
+    const cell = this.cellHistory.pop();
+    if (cell !== undefined) {
+      const [row, col] = cell;
+      this.balda.grid[row][col] = '';
+    }
+    this.callbacks.setWordHistory([...this.wordHistory]);
     this.update();
   }
 
@@ -188,6 +204,9 @@ class Game {
     const [word, path] = this.balda.possibleWords[index];
     for (let i = 0; i < word.length; i++) {
       const [row, col] = path[i];
+      if (this.balda.grid[row][col] === '') {
+        this.cellHistory.push([row, col]);
+      }
       this.balda.grid[row][col] = word[i];
     }
     this.wordHistory.push([word, path]);

@@ -90,6 +90,10 @@ function App() {
       game.mouseLeave();
     }, [game])
   };
+  const undoButton = (<button
+    className='button-auto'
+    disabled={wordHistory.length === 0}
+    onClick={() => game.undo()}>Undo</button>);
   return (
     <div className='App'>
       <div className='flex-column'>
@@ -136,13 +140,16 @@ function App() {
       </div>
       { twoPlayersMode ? (
         <>
-          <WordList
-            label={`Player 1: ${score1}`}
-            wordPaths={wordHistory1}
-            setHighlightIndex={(i) => {
-              game.setHighlightIndex(i !== undefined ? i*2 : i);
-            }}
-          />
+          <div className='flex-column'>
+            <WordList
+              label={`Player 1: ${score1}`}
+              wordPaths={wordHistory1}
+              setHighlightIndex={(i) => {
+                game.setHighlightIndex(i !== undefined ? i*2 : i);
+              }}
+            />
+            {undoButton}
+          </div>
           <WordList
             label={`Player 2: ${score2}`}
             wordPaths={wordHistory2}
@@ -152,11 +159,14 @@ function App() {
           />
         </>
       ) : (
-        <WordList
-          label='Word history'
-          wordPaths={wordHistory}
-          setHighlightIndex={(i) => game.setHighlightIndex(i)}
-        />
+        <div className='flex-column'>
+          <WordList
+            label='Word history'
+            wordPaths={wordHistory}
+            setHighlightIndex={(i) => game.setHighlightIndex(i)}
+          />
+          {undoButton}
+        </div>
       ) }
     </div>
   );

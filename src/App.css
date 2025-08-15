@@ -151,7 +151,7 @@ button {
 fieldset {
   margin: 6px;
   min-width: 160px;
-  max-height: 240px;
+  height: 240px;
   overflow: auto;
 }
 
