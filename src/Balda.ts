@@ -3,12 +3,12 @@ interface Dictionary {
 }
 
 class Balda {
-  grid: string[][];
+  grid: string[][] = [];
   possibleWords: [string, [number, number][]][] = [];
   private rows: number;
   private cols: number;
   private dictionary: Dictionary = {};
-  private initWords: string[] = [];
+  private initWords: string[][] = [];
   private initWord: string = '';
 
   constructor(rows: number, cols: number, grid?: string[][]) {
@@ -17,10 +17,14 @@ class Balda {
     if (grid) {
       this.grid = grid;
     } else {
-      this.grid = [];
-      for (let i = 0; i < rows; i++) {
-        this.grid.push(Array(cols).fill(''));
-      }
+      this.resetGrid();
+    }
+  }
+
+  private resetGrid() {
+    this.grid = [];
+    for (let i = 0; i < this.rows; i++) {
+      this.grid.push(Array(this.cols).fill(''));
     }
   }
 
@@ -121,27 +125,35 @@ class Balda {
     const text = await response.text();
     const words = text.split(/\r?\n/).map(x => x.trim().toLowerCase());
     for (const word of words) {
-      if (word.length === this.cols) {
-        this.initWords.push(word);
-      }
       this.addWord(word);
+    }
+    for (let i = 3; i <= 9; i++) {
+      this.initWords[i] = [];
+      for (const word of words) {
+        if (word.length === i) {
+          this.initWords[i].push(word);
+        }
+      }
     }
   }
 
   reset() {
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.cols; j++) {
-        this.grid[i][j] = '';
-      }
-    }
-    if (this.initWords.length === 0) {
+    this.resetGrid();
+    const initWords = this.initWords[this.cols];
+    if (initWords.length === 0) {
       return;
     }
-    const word = this.initWords[Math.floor(Math.random()*this.initWords.length)];
+    const word = initWords[Math.floor(Math.random()*initWords.length)];
     const y = Math.floor(this.rows/2);
     for (let i = 0; i < this.cols; i++) {
       this.grid[y][i] = word[i];
     }
+  }
+
+  setDimensions(rows: number, cols: number) {
+    this.rows = rows;
+    this.cols = cols;
+    this.reset();
   }
 
   update() {

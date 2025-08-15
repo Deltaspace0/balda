@@ -135,8 +135,14 @@ class Game {
     this.callbacks.setWordHistory([...this.wordHistory]);
   }
 
-  reset() {
-    this.balda.reset();
+  reset(rows?: number, cols?: number) {
+    if (rows !== undefined && cols !== undefined) {
+      this.rows = rows;
+      this.cols = cols;
+      this.balda.setDimensions(rows, cols);
+    } else {
+      this.balda.reset();
+    }
     this.hoveredCell = null;
     this.setNewCell();
     this.addWord();
@@ -258,8 +264,8 @@ class Game {
 
   render(ctx: CanvasRenderingContext2D) {
     ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    const dw = Math.floor(GAME_WIDTH/this.cols);
-    const dh = Math.floor(GAME_HEIGHT/this.rows);
+    const dw = GAME_WIDTH/this.cols;
+    const dh = GAME_HEIGHT/this.rows;
     ctx.font = `${Math.floor(Math.min(dw, dh)*0.6)}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

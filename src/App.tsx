@@ -1,7 +1,8 @@
 import './App.css';
 import Canvas from './components/Canvas';
-import WordList from './components/WordList';
 import LetterPanel from './components/LetterPanel';
+import { useListSlider, Slider } from './components/Slider';
+import WordList from './components/WordList';
 import Game from './Game';
 import { useCallback, useRef, useState } from 'react';
 
@@ -19,6 +20,20 @@ function App() {
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
   const [possibleWords, setPossibleWords] = useState<WordPaths>([]);
+  const [rows, setRows] = useState(5);
+  const [cols, setCols] = useState(5);
+  const rowProps = useListSlider({
+    label: 'Rows',
+    initialValue: 5,
+    list: [3, 4, 5, 6, 7, 8, 9],
+    callback: setRows
+  });
+  const colProps = useListSlider({
+    label: 'Columns',
+    initialValue: 5,
+    list: [3, 4, 5, 6, 7, 8, 9],
+    callback: setCols
+  });
   const handleWordHistory = (newWordHistory: WordPaths) => {
     setWordHistory(newWordHistory);
     const newWordHistory1: WordPaths = [];
@@ -89,7 +104,9 @@ function App() {
         <LetterPanel letter={letter} setLetter={handleLetter}/>
       </div>
       <div className='flex-column'>
-        <button onClick={() => game.reset()}>Reset game</button>
+        <button onClick={() => game.reset(rows, cols)}>Reset game</button>
+        <Slider {...rowProps}/>
+        <Slider {...colProps}/>
         <label>
           <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
           <p>Edit mode</p>
