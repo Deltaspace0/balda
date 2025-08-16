@@ -60,7 +60,7 @@ class Game {
     this.cols = cols;
     this.callbacks = callbacks;
     this.balda = new Balda(rows, cols);
-    this.balda.loadDictionary('/nouns.txt').then(() => this.reset());
+    this.balda.loadDictionary('/balda/nouns.txt').then(() => this.reset());
   }
 
   private getGridCoordinates(x: number, y: number) {
