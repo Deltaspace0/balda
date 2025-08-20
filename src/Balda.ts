@@ -120,12 +120,14 @@ class Balda {
     }
   }
 
-  async loadDictionary(path: string) {
-    const response = await fetch(path);
-    const text = await response.text();
-    const words = text.split(/\r?\n/).map(x => x.trim().toLowerCase());
-    for (const word of words) {
-      this.addWord(word);
+  loadDictionary(nouns: object) {
+    const words = [];
+    for (const word in nouns) {
+      const lower = word.toLowerCase();
+      if (!/[a-z]/.test(lower)) {
+        words.push(lower);
+        this.addWord(lower);
+      }
     }
     for (let i = 3; i <= 9; i++) {
       this.initWords[i] = [];

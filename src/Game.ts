@@ -1,5 +1,6 @@
 import Balda from './Balda';
 import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
+import nouns from './nouns.json' with { type: 'json' };
 
 interface GameCallbacks {
   setStatus: (status: string) => void;
@@ -60,7 +61,8 @@ class Game {
     this.cols = cols;
     this.callbacks = callbacks;
     this.balda = new Balda(rows, cols);
-    this.balda.loadDictionary('/balda/nouns.txt').then(() => this.reset());
+    this.balda.loadDictionary(nouns);
+    this.reset();
   }
 
   private getGridCoordinates(x: number, y: number) {
