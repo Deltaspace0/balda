@@ -1,24 +1,27 @@
 interface LetterPanelProps {
+  letters: string;
   letter: string;
   setLetter: (letter: string) => void;
 }
 
-function LetterPanel({ letter, setLetter }: LetterPanelProps) {
-  const letters = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+function LetterPanel({ letters, letter, setLetter }: LetterPanelProps) {
   const letterRows = [];
+  let counter = 0;
   for (let i = 0; i < 3; i++) {
     const row = [];
-    for (let j = 0; j < 11; j++) {
-      const l = letters[i*11+j];
+    const rowSize = Math.floor((letters.length-counter)/(3-i));
+    for (let j = 0; j < rowSize; j++) {
+      const l = letters[counter+j];
       const className = l === letter ? 'letter-selected' : 'letter';
       row.push(<button
         onClick={() => setLetter(l)}
         className={className}>{l}</button>);
     }
     letterRows.push(<div className='letter-row'>{row}</div>);
+    counter += rowSize;
   }
   return (
-    <div className='flex-column'>
+    <div className='flex-column' style={{alignItems: 'center'}}>
       {letterRows}
     </div>
   );

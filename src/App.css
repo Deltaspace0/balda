@@ -71,7 +71,7 @@ input[type="radio"]:checked::after {
   height: 8px;
   background: #0ec3c9;
   border-radius: 50%;
-  transform: translate(calc(-50% - 0.5px), calc(-50% - 0.5px));
+  transform: translate(calc(-50%), calc(-50%));
 }
 
 input[type="range"] {
@@ -196,7 +196,7 @@ p {
 }
 
 .letter-row {
-  margin: 0 6px;
+  margin: auto 6px;
 }
 
 .letter {

@@ -2,18 +2,33 @@ interface Dictionary {
   [key: string]: Dictionary
 }
 
+function addWord(dictionary: Dictionary, word: string) {
+  for (const letter of word) {
+    if (!(letter in dictionary)) {
+      dictionary[letter] = {};
+    }
+    dictionary = dictionary[letter];
+  }
+  dictionary[''] = {};
+}
+
 class Balda {
   grid: string[][] = [];
   possibleWords: [string, [number, number][]][] = [];
   private rows: number;
   private cols: number;
-  private dictionary: Dictionary = {};
-  private initWords: string[][] = [];
+  private language: string = 'English';
+  private dictionaries: Record<string, Dictionary>;
+  private possibleInitWords: Record<string, string[][]> = {};
   private initWord: string = '';
 
   constructor(rows: number, cols: number, grid?: string[][]) {
     this.rows = rows;
     this.cols = cols;
+    this.dictionaries = {
+      'English': {},
+      'Russian': {}
+    };
     if (grid) {
       this.grid = grid;
     } else {
@@ -26,17 +41,6 @@ class Balda {
     for (let i = 0; i < this.rows; i++) {
       this.grid.push(Array(this.cols).fill(''));
     }
-  }
-
-  private addWord(word: string) {
-    let dictionary = this.dictionary;
-    for (const letter of word) {
-      if (!(letter in dictionary)) {
-        dictionary[letter] = {};
-      }
-      dictionary = dictionary[letter];
-    }
-    dictionary[''] = {};
   }
 
   private addPossibleWord(word: string, path: [number, number][]) {
@@ -107,41 +111,51 @@ class Balda {
   }
 
   private generatePossibleWords() {
+    const dictionary = this.dictionaries[this.language];
     this.possibleWords = [];
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         const l = this.grid[i][j];
-        if (l !== '' && !(l in this.dictionary)) {
+        if (l !== '' && !(l in dictionary)) {
           continue;
         }
-        const dictionary = l === '' ? this.dictionary : this.dictionary[l];
-        this.generatePossibleWordsFromPath([[i, j]], dictionary, false);
+        const subDictionary = l === '' ? dictionary : dictionary[l];
+        this.generatePossibleWordsFromPath([[i, j]], subDictionary, false);
       }
     }
   }
 
   loadDictionary(nouns: object) {
-    const words = [];
+    const languageWords: Record<string, string[]> = {
+      English: [],
+      Russian: []
+    };
     for (const word in nouns) {
       const lower = word.toLowerCase();
-      if (!/[a-z]/.test(lower)) {
-        words.push(lower);
-        this.addWord(lower);
-      }
+      const language = /[a-z]/.test(lower) ? 'English' : 'Russian';
+      languageWords[language].push(lower);
+      addWord(this.dictionaries[language], lower);
     }
-    for (let i = 3; i <= 9; i++) {
-      this.initWords[i] = [];
-      for (const word of words) {
-        if (word.length === i) {
-          this.initWords[i].push(word);
+    for (const language in languageWords) {
+      const initWords: string[][] = [];
+        for (let i = 3; i <= 9; i++) {
+          initWords[i] = [];
+          for (const word of languageWords[language]) {
+            if (word.length === i) {
+              initWords[i].push(word);
+            }
+          }
         }
-      }
+      this.possibleInitWords[language] = initWords;
     }
   }
 
-  reset() {
+  reset(language?: string) {
+    if (language) {
+      this.language = language;
+    }
     this.resetGrid();
-    const initWords = this.initWords[this.cols];
+    const initWords = this.possibleInitWords[this.language][this.cols];
     if (initWords.length === 0) {
       return;
     }
@@ -172,7 +186,7 @@ class Balda {
   }
 
   checkWord(word: string): boolean {
-    let dictionary = this.dictionary;
+    let dictionary = this.dictionaries[this.language];
     for (const letter of word) {
       if (!(letter in dictionary)) {
         return false;

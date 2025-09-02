@@ -148,18 +148,28 @@ class Game {
     this.callbacks.setWordHistory([...this.wordHistory]);
   }
 
-  reset(rows?: number, cols?: number) {
-    if (rows !== undefined && cols !== undefined) {
-      this.rows = rows;
-      this.cols = cols;
-      this.balda.setDimensions(rows, cols);
-    } else {
-      this.balda.reset();
-    }
+  private resetGame() {
     this.hoveredCell = null;
     this.setNewCell();
     this.addWord();
     this.update();
+  }
+
+  reset() {
+    this.balda.reset();
+    this.resetGame();
+  }
+
+  setDimensions(rows: number, cols: number) {
+    this.rows = rows;
+    this.cols = cols;
+    this.balda.setDimensions(rows, cols);
+    this.resetGame();
+  }
+
+  setLanguage(language: string) {
+    this.balda.reset(language);
+    this.resetGame();
   }
 
   undo() {

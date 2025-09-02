@@ -7,9 +7,15 @@ import Game from './Game';
 import { useCallback, useRef, useState } from 'react';
 
 type WordPaths = [string, [number, number][]][];
+type Language = 'English' | 'Russian';
+const languageLetters = {
+  'English': 'abcdefghijklmnopqrstuvwxyz',
+  'Russian': 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+};
 
 function App() {
-  const [letter, setLetter] = useState('а');
+  const [language, setLanguage] = useState<Language>('English');
+  const [letter, setLetter] = useState('a');
   const [editEnabled, setEditEnabled] = useState(false);
   const [twoPlayersMode, setTwoPlayersMode] = useState(false);
   const [showPossible, setShowPossible] = useState(true);
@@ -93,11 +99,40 @@ function App() {
   const undoButton = (<button
     className='button-auto'
     disabled={wordHistory.length === 0}
-    onClick={() => game.undo()}>Undo</button>);
+    onClick={() => game.undo()}>Undo
+  </button>);
+  const handleLanguage = (language: Language) => {
+    setLanguage(language);
+    setLetter(languageLetters[language][0]);
+    game.setLanguage(language);
+  };
   return (
     <div className='App'>
       <div className='flex-column'>
-        <button onClick={() => game.reset(rows, cols)}>Reset game</button>
+        <fieldset style={{height: '90px'}}>
+          <legend>Language</legend>
+          <label>
+            <input
+              type='radio'
+              name='language'
+              value='English'
+              checked={language === 'English'}
+              onChange={() => handleLanguage('English')}
+            />
+            <p>English</p>
+          </label>
+          <label>
+            <input
+              type='radio'
+              name='language'
+              value='Russian'
+              checked={language === 'Russian'}
+              onChange={() => handleLanguage('Russian')}
+            />
+            <p>Russian</p>
+          </label>
+        </fieldset>
+        <button onClick={() => game.setDimensions(rows, cols)}>Reset game</button>
         <Slider {...rowProps}/>
         <Slider {...colProps}/>
         <label>
@@ -124,7 +159,10 @@ function App() {
       </div>
       <div className='flex-column'>
         <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
-        <LetterPanel letter={letter} setLetter={handleLetter}/>
+        <LetterPanel
+          letters={languageLetters[language]}
+          letter={letter}
+          setLetter={handleLetter}/>
         { status === 'add-letter' && <p className='status'>Add letter</p> }
         { status === 'select-path' &&
             <label>
