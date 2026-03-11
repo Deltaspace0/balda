@@ -101,6 +101,15 @@ function App() {
   };
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        game.cancelNewLetter();
+      }
+    };
+    window.addEventListener('keydown', listener);
+    return () => window.removeEventListener('keydown', listener);
+  }, [game]);
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
       if (languageLetters[language].includes(e.key)) {
         handleLetter(e.key);
       }

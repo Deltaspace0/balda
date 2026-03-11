@@ -129,6 +129,7 @@ class Game extends EventTarget {
     this.newCell = null;
     this.wordPath = [];
     this.selectingPath = false;
+    this.unknownWord = null;
   }
 
   private addWord(word?: string) {
