@@ -2,12 +2,6 @@ import Balda from './Balda';
 import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 import nouns from './nouns.json' with { type: 'json' };
 
-interface GameCallbacks {
-  setStatus: (status: string) => void;
-  setWordHistory: (wordHistory: [string, [number, number][]][]) => void;
-  setPossibleWords: (possibleWords: [string, [number, number][]][]) => void;
-}
-
 function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
   const a = Math.atan2(y2-y1, x2-x1);
   ctx.moveTo(x1, y1);
@@ -39,14 +33,13 @@ function drawPathArrows(ctx: CanvasRenderingContext2D, path: [number, number][],
   }
 }
 
-class Game {
+class Game extends EventTarget {
   private rows: number;
   private cols: number;
-  private callbacks: GameCallbacks;
   private balda: Balda;
-  private letter: string = 'а';
-  private editEnabled: boolean = false;
-  private selectingPath: boolean = false;
+  private letter = 'а';
+  private editEnabled = false;
+  private selectingPath = false;
   private unknownWord: string | null = null;
   private hoveredCell: [number, number] | null = null;
   private newCell: [number, number] | null = null;
@@ -56,13 +49,12 @@ class Game {
   private highlightIndex: number | null = null;
   private possibleIndex: number | null = null;
 
-  constructor(rows: number, cols: number, callbacks: GameCallbacks) {
+  constructor(rows: number, cols: number) {
+    super();
     this.rows = rows;
     this.cols = cols;
-    this.callbacks = callbacks;
     this.balda = new Balda(rows, cols);
     this.balda.loadDictionary(nouns);
-    this.reset();
   }
 
   private getGridCoordinates(x: number, y: number) {
@@ -71,13 +63,17 @@ class Game {
     return [row, col];
   }
 
+  private emitEvent(type: string, detail: unknown) {
+    this.dispatchEvent(new CustomEvent(type, { detail }));
+  }
+
   private update() {
     this.balda.update();
     const possibleWords = this.balda.possibleWords
       .filter((x) => this.isUnique(x[0]))
       .sort(([word1], [word2]) => word2.length-word1.length);
     this.balda.possibleWords = possibleWords;
-    this.callbacks.setPossibleWords([...possibleWords]);
+    this.emitEvent('possible-words', [...possibleWords]);
   }
 
   private isUnique(word: string): boolean {
@@ -115,7 +111,7 @@ class Game {
     }
     if (!this.balda.checkWord(word)) {
       this.unknownWord = word;
-      this.callbacks.setStatus('unknown-word');
+      this.emitEvent('status', 'unknown-word');
       return;
     }
     this.addWord(word);
@@ -126,10 +122,10 @@ class Game {
   private setNewCell(newCell?: [number, number]) {
     if (newCell) {
       this.newCell = newCell;
-      this.callbacks.setStatus('select-path');
+      this.emitEvent('status', 'select-path');
       return;
     }
-    this.callbacks.setStatus('add-letter');
+    this.emitEvent('status', 'add-letter');
     this.newCell = null;
     this.wordPath = [];
     this.selectingPath = false;
@@ -145,7 +141,7 @@ class Game {
       this.wordHistory = [];
       this.cellHistory = [];
     }
-    this.callbacks.setWordHistory([...this.wordHistory]);
+    this.emitEvent('word-history', [...this.wordHistory]);
   }
 
   private resetGame() {
@@ -179,7 +175,7 @@ class Game {
       const [row, col] = cell;
       this.balda.grid[row][col] = '';
     }
-    this.callbacks.setWordHistory([...this.wordHistory]);
+    this.emitEvent('word-history', [...this.wordHistory]);
     this.update();
   }
 
@@ -222,7 +218,7 @@ class Game {
       this.balda.grid[row][col] = word[i];
     }
     this.wordHistory.push([word, path]);
-    this.callbacks.setWordHistory([...this.wordHistory]);
+    this.emitEvent('word-history', [...this.wordHistory]);
     this.update();
   }
 
@@ -245,7 +241,7 @@ class Game {
       this.update();
     } else {
       this.wordPath = [];
-      this.callbacks.setStatus('select-path');
+      this.emitEvent('status', 'select-path');
     }
     this.unknownWord = null;
   }

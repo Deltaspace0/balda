@@ -63,12 +63,18 @@ function App() {
   };
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
-    const callbacks = {
-      setStatus: setStatus,
-      setWordHistory: handleWordHistory,
-      setPossibleWords: setPossibleWords
-    };
-    gameRef.current = new Game(5, 5, callbacks);
+    const game = new Game(5, 5);
+    game.addEventListener('status', (e) => {
+      setStatus((e as CustomEvent).detail);
+    });
+    game.addEventListener('word-history', (e) => {
+      handleWordHistory((e as CustomEvent).detail);
+    });
+    game.addEventListener('possible-words', (e) => {
+      setPossibleWords((e as CustomEvent).detail);
+    });
+    game.reset();
+    gameRef.current = game;
   }
   const game = gameRef.current;
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
