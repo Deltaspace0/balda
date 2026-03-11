@@ -16,9 +16,13 @@ function Canvas({ draw, className, mouseHandlers }: CanvasProps) {
   const lastTimeRef = useRef<number>(0);
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
     const ctx = canvas.getContext('2d', { alpha: false });
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
     const dpr = window.devicePixelRatio;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;

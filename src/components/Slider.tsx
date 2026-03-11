@@ -23,7 +23,10 @@ export function useListSlider(props: SliderHookProps): SliderProps {
   return {
     label: props.label,
     value: props.list.indexOf(value),
-    setValue: (value) => {setValue(value); props.callback(value)},
+    setValue: (value) => {
+      setValue(value);
+      props.callback(value);
+    },
     min: 0,
     max: props.list.length-1,
     step: 1,
