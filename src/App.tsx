@@ -112,11 +112,13 @@ function App() {
     const listener = (e: KeyboardEvent) => {
       if (languageLetters[language].includes(e.key)) {
         handleLetter(e.key);
+        game.mouseDown();
+        game.mouseUp();
       }
     };
     window.addEventListener('keypress', listener);
     return () => window.removeEventListener('keypress', listener);
-  }, [language, handleLetter]);
+  }, [game, language, handleLetter]);
   return (<div className='App'>
     <div className='flex-column'>
       <fieldset style={{height: 'auto'}}>

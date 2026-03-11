@@ -273,8 +273,13 @@ class Game extends EventTarget {
     this.hoveredCell = [row, col];
   }
 
-  mouseDown(x: number, y: number) {
-    const [row, col] = this.getGridCoordinates(x, y);
+  mouseDown(x?: number, y?: number) {
+    const [row, col] = x === undefined || y === undefined
+      ? (this.hoveredCell ?? [-1, -1])
+      : this.getGridCoordinates(x, y);
+    if (row === -1) {
+      return;
+    }
     const currentLetter = this.balda.grid[row][col];
     if (this.editEnabled) {
       if (currentLetter === '') {
