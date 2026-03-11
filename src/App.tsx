@@ -4,7 +4,7 @@ import LetterPanel from './components/LetterPanel';
 import { useListSlider, Slider } from './components/Slider';
 import WordList from './components/WordList';
 import Game from './Game';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 type WordPaths = [string, [number, number][]][];
 type Language = 'English' | 'Russian';
@@ -21,10 +21,6 @@ function App() {
   const [showPossible, setShowPossible] = useState(true);
   const [status, setStatus] = useState('add-letter');
   const [wordHistory, setWordHistory] = useState<WordPaths>([]);
-  const [wordHistory1, setWordHistory1] = useState<WordPaths>([]);
-  const [wordHistory2, setWordHistory2] = useState<WordPaths>([]);
-  const [score1, setScore1] = useState(0);
-  const [score2, setScore2] = useState(0);
   const [possibleWords, setPossibleWords] = useState<WordPaths>([]);
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
@@ -40,27 +36,23 @@ function App() {
     list: [3, 4, 5, 6, 7, 8, 9],
     callback: setCols
   });
-  const handleWordHistory = (newWordHistory: WordPaths) => {
-    setWordHistory(newWordHistory);
-    const newWordHistory1: WordPaths = [];
-    const newWordHistory2: WordPaths = [];
-    let newScore1 = 0;
-    let newScore2 = 0;
-    for (let i = 0; i < newWordHistory.length; i++) {
-      const [word, path] = newWordHistory[i];
+  const [wordHistory1, wordHistory2, score1, score2] = useMemo(() => {
+    const wordHistory1: WordPaths = [];
+    const wordHistory2: WordPaths = [];
+    let score1 = 0;
+    let score2 = 0;
+    for (let i = 0; i < wordHistory.length; i++) {
+      const [word, path] = wordHistory[i];
       if (i%2 === 0) {
-        newWordHistory1.push([word, path]);
-        newScore1 += word.length;
+        wordHistory1.push([word, path]);
+        score1 += word.length;
       } else {
-        newWordHistory2.push([word, path]);
-        newScore2 += word.length;
+        wordHistory2.push([word, path]);
+        score2 += word.length;
       }
     }
-    setWordHistory1(newWordHistory1);
-    setWordHistory2(newWordHistory2);
-    setScore1(newScore1);
-    setScore2(newScore2);
-  };
+    return [wordHistory1, wordHistory2, score1, score2];
+  }, [wordHistory]);
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
     const game = new Game(5, 5);
@@ -68,7 +60,7 @@ function App() {
       setStatus((e as CustomEvent).detail);
     });
     game.addEventListener('word-history', (e) => {
-      handleWordHistory((e as CustomEvent).detail);
+      setWordHistory((e as CustomEvent).detail);
     });
     game.addEventListener('possible-words', (e) => {
       setPossibleWords((e as CustomEvent).detail);
