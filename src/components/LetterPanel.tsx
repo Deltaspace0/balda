@@ -15,16 +15,18 @@ function LetterPanel({ letters, letter, setLetter }: LetterPanelProps) {
       const className = l === letter ? 'letter-selected' : 'letter';
       row.push(<button
         onClick={() => setLetter(l)}
-        className={className}>{l}</button>);
+        className={className}
+        style={{fontSize: '24px'}}
+      >
+        {l}
+      </button>);
     }
     letterRows.push(<div className='letter-row'>{row}</div>);
     counter += rowSize;
   }
-  return (
-    <div className='flex-column' style={{alignItems: 'center'}}>
-      {letterRows}
-    </div>
-  );
+  return (<div className='flex-column' style={{alignItems: 'center'}}>
+    {letterRows}
+  </div>);
 }
 
 export default LetterPanel;
