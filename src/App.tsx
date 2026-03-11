@@ -4,7 +4,7 @@ import LetterPanel from './components/LetterPanel';
 import { useListSlider, Slider } from './components/Slider';
 import WordList from './components/WordList';
 import Game from './Game';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type WordPaths = [string, [number, number][]][];
 type Language = 'English' | 'Russian';
@@ -99,6 +99,15 @@ function App() {
     setLetter(languageLetters[language][0]);
     game.setLanguage(language);
   };
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (languageLetters[language].includes(e.key)) {
+        handleLetter(e.key);
+      }
+    };
+    window.addEventListener('keypress', listener);
+    return () => window.removeEventListener('keypress', listener);
+  }, [language, handleLetter]);
   return (<div className='App'>
     <div className='flex-column'>
       <fieldset style={{height: 'auto'}}>

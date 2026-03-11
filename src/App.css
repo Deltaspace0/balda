@@ -251,7 +251,13 @@ p {
 .letter-selected {
   margin: 0px;
   width: 36px;
-  background-color: #36335d;
+  background-color: #30449e;
+  &:hover {
+    background: #30449e;
+  }
+  &:active {
+    background: #16002e;
+  }
 }
 
 .game-canvas {
