@@ -155,7 +155,7 @@ input[type="range"]:disabled::-webkit-slider-runnable-track {
 
 button {
   font-size: 12px;
-  width: 180px;
+  width: 100%;
   margin: 6px;
   padding: 6px;
   background: #0f0718;
@@ -186,6 +186,10 @@ fieldset {
   overflow: auto;
 }
 
+ol {
+  margin: auto;
+}
+
 li {
   transition: color 0.3s ease-in-out;
 }
@@ -212,7 +216,8 @@ p {
   background: #0a111e;
   min-height: 100vh;
   display: flex;
-  padding: 10px;
+  justify-content: center;
+  align-items: center;
   color: #ddd;
 }
 
@@ -224,6 +229,13 @@ p {
 .flex-column {
   display: flex;
   flex-direction: column;
+}
+
+.flex-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
 }
 
 .letter-row {

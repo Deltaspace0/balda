@@ -96,118 +96,110 @@ function App() {
       game.mouseLeave();
     }, [game])
   };
-  const undoButton = (<button
-    className='button-auto'
-    disabled={wordHistory.length === 0}
-    onClick={() => game.undo()}>Undo
-  </button>);
   const handleLanguage = (language: Language) => {
     setLanguage(language);
     setLetter(languageLetters[language][0]);
     game.setLanguage(language);
   };
-  return (
-    <div className='App'>
-      <div className='flex-column'>
-        <fieldset style={{height: '90px'}}>
-          <legend>Language</legend>
-          <label>
-            <input
-              type='radio'
-              name='language'
-              value='English'
-              checked={language === 'English'}
-              onChange={() => handleLanguage('English')}
-            />
-            <p>English</p>
-          </label>
-          <label>
-            <input
-              type='radio'
-              name='language'
-              value='Russian'
-              checked={language === 'Russian'}
-              onChange={() => handleLanguage('Russian')}
-            />
-            <p>Russian</p>
-          </label>
-        </fieldset>
+  return (<div className='App'>
+    <div className='flex-column'>
+      <fieldset style={{height: 'auto'}}>
+        <legend>Language</legend>
+        <label>
+          <input
+            type='radio'
+            name='language'
+            value='English'
+            checked={language === 'English'}
+            onChange={() => handleLanguage('English')}
+          />
+          <p>English</p>
+        </label>
+        <label>
+          <input
+            type='radio'
+            name='language'
+            value='Russian'
+            checked={language === 'Russian'}
+            onChange={() => handleLanguage('Russian')}
+          />
+          <p>Russian</p>
+        </label>
+      </fieldset>
+      <div className='flex-row'>
         <button onClick={() => game.setDimensions(rows, cols)}>Reset game</button>
-        <Slider {...rowProps}/>
-        <Slider {...colProps}/>
-        <label>
-          <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
-          <p>Edit mode</p>
-        </label>
-        <label>
-          <input type='checkbox' checked={twoPlayersMode} onChange={(e) => setTwoPlayersMode(e.target.checked)}/>
-          <p>Two players</p>
-        </label>
-        <label>
-          <input type='checkbox' checked={showPossible} onChange={(e) => setShowPossible(e.target.checked)}/>
-          <p>Show possible words</p>
-        </label>
-        {showPossible && <WordList
-          label='Possible words'
-          wordPaths={possibleWords}
-          setHighlightIndex={(i) => game.setPossibleIndex(i)}
-          onClick={(i) => {
-            game.selectPossibleWord(i);
-            game.setPossibleIndex();
-          }}
-        />}
+        <button disabled={wordHistory.length === 0} onClick={() => game.undo()}>
+          Undo
+        </button>
       </div>
-      <div className='flex-column'>
-        <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
-        <LetterPanel
-          letters={languageLetters[language]}
-          letter={letter}
-          setLetter={handleLetter}/>
-        { status === 'add-letter' && <p className='status'>Add letter</p> }
-        { status === 'select-path' &&
-            <label>
-              <button className='button-auto' onClick={() => game.cancelNewLetter()}>Cancel</button>
-              <p>Select word path</p>
-            </label> }
-        { status === 'unknown-word' &&
-            <div>
-              <button className='button-auto' onClick={() => game.resolveUnknownWord(true)}>Add</button>
-              <button className='button-auto' onClick={() => game.resolveUnknownWord(false)}>Cancel</button>
-              <p className='status'>Unknown word: {game.getUnknownWord()}. Add it anyway?</p>
-            </div> }
-      </div>
-      { twoPlayersMode ? (
-        <>
-          <div className='flex-column'>
-            <WordList
-              label={`Player 1: ${score1}`}
-              wordPaths={wordHistory1}
-              setHighlightIndex={(i) => {
-                game.setHighlightIndex(i !== undefined ? i*2 : i);
-              }}
-            />
-            {undoButton}
-          </div>
-          <WordList
-            label={`Player 2: ${score2}`}
-            wordPaths={wordHistory2}
-            setHighlightIndex={(i) => {
-              game.setHighlightIndex(i !== undefined ? i*2+1 : i);
-            }}
-          />
-        </>
-      ) : (
-        <div className='flex-column'>
-          <WordList
-            label='Word history'
-            wordPaths={wordHistory}
-            setHighlightIndex={(i) => game.setHighlightIndex(i)}
-          />
-          {undoButton}
-        </div>
-      ) }
+      <Slider {...rowProps}/>
+      <Slider {...colProps}/>
+      <label>
+        <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
+        <p>Edit mode</p>
+      </label>
+      <label>
+        <input type='checkbox' checked={twoPlayersMode} onChange={(e) => setTwoPlayersMode(e.target.checked)}/>
+        <p>Two players</p>
+      </label>
+      <label>
+        <input type='checkbox' checked={showPossible} onChange={(e) => setShowPossible(e.target.checked)}/>
+        <p>Show possible words</p>
+      </label>
+      {showPossible && <WordList
+        label='Possible words'
+        wordPaths={possibleWords}
+        setHighlightIndex={(i) => game.setPossibleIndex(i)}
+        onClick={(i) => {
+          game.selectPossibleWord(i);
+          game.setPossibleIndex();
+        }}
+      />}
     </div>
-  );
+    <div className='flex-column'>
+      <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
+      <LetterPanel
+        letters={languageLetters[language]}
+        letter={letter}
+        setLetter={handleLetter}/>
+      { status === 'add-letter' && <p className='status'>Add letter</p> }
+      { status === 'select-path' &&
+          <label>
+            <button className='button-auto' onClick={() => game.cancelNewLetter()}>Cancel</button>
+            <p>Select word path</p>
+          </label> }
+      { status === 'unknown-word' &&
+          <div>
+            <button className='button-auto' onClick={() => game.resolveUnknownWord(true)}>Add</button>
+            <button className='button-auto' onClick={() => game.resolveUnknownWord(false)}>Cancel</button>
+            <p className='status'>Unknown word: {game.getUnknownWord()}. Add it anyway?</p>
+          </div> }
+    </div>
+    { twoPlayersMode ? (<>
+      <div className='flex-column'>
+        <WordList
+          label={`Player 1: ${score1}`}
+          wordPaths={wordHistory1}
+          setHighlightIndex={(i) => {
+            game.setHighlightIndex(i !== undefined ? i*2 : i);
+          }}
+        />
+      </div>
+      <WordList
+        label={`Player 2: ${score2}`}
+        wordPaths={wordHistory2}
+        setHighlightIndex={(i) => {
+          game.setHighlightIndex(i !== undefined ? i*2+1 : i);
+        }}
+      />
+    </>) : (<div className='flex-column'>
+      <WordList
+        label='Word history'
+        wordPaths={wordHistory}
+        setHighlightIndex={(i) => game.setHighlightIndex(i)}
+      />
+    </div>) }
+  </div>);
 }
 
 export default App;
