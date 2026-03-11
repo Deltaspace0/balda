@@ -219,6 +219,7 @@ p {
   justify-content: center;
   align-items: center;
   color: #ddd;
+  user-select: none;
 }
 
 .flex-center {

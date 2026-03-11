@@ -1,8 +1,11 @@
+import type { CSSProperties } from 'react';
+
 interface WordListProps {
   label: string;
   wordPaths: [string, [number, number][]][];
   setHighlightIndex: (index?: number) => void;
   onClick?: (index: number) => void;
+  style?: CSSProperties;
 }
 
 function WordList(props: WordListProps) {
@@ -16,7 +19,7 @@ function WordList(props: WordListProps) {
       {props.wordPaths[i][0]}
     </li>);
   }
-  return (<fieldset>
+  return (<fieldset style={props.style}>
     <legend>{props.label}</legend>
     <ol>{elements}</ol>
   </fieldset>);

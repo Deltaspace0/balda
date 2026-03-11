@@ -206,6 +206,7 @@ function App() {
         label='Word history'
         wordPaths={wordHistory}
         setHighlightIndex={(i) => game.setHighlightIndex(i)}
+        style={{userSelect: 'text'}}
       />
     </div>) }
   </div>);
