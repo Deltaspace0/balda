@@ -5,22 +5,21 @@ interface WordListProps {
   onClick?: (index: number) => void;
 }
 
-function WordList({ label, wordPaths: wordPaths, setHighlightIndex, onClick }: WordListProps) {
+function WordList(props: WordListProps) {
   const elements = [];
-  for (let i = 0; i < wordPaths.length; i++) {
+  for (let i = 0; i < props.wordPaths.length; i++) {
     elements.push(<li
-      onMouseOver={() => setHighlightIndex(i)}
-      onMouseLeave={() => setHighlightIndex()}
-      onClick={() => onClick && onClick(i)}>
-        {wordPaths[i][0]}
+      onMouseOver={() => props.setHighlightIndex(i)}
+      onMouseLeave={() => props.setHighlightIndex()}
+      onClick={() => props.onClick && props.onClick(i)}
+    >
+      {props.wordPaths[i][0]}
     </li>);
   }
-  return (
-    <fieldset>
-      <legend>{label}</legend>
-      <ol>{elements}</ol>
-    </fieldset>
-  );
+  return (<fieldset>
+    <legend>{props.label}</legend>
+    <ol>{elements}</ol>
+  </fieldset>);
 }
 
 export default WordList;

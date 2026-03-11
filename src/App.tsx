@@ -157,6 +157,9 @@ function App() {
         wordPaths={possibleWords}
         setHighlightIndex={(i) => game.setPossibleIndex(i)}
         onClick={(i) => {
+          if (status !== 'add-letter') {
+            return;
+          }
           game.selectPossibleWord(i);
           game.setPossibleIndex();
         }}
