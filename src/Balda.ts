@@ -1,3 +1,5 @@
+export type Language = 'en' | 'ru';
+
 interface Dictionary {
   [key: string]: Dictionary
 }
@@ -17,18 +19,15 @@ class Balda {
   possibleWords: [string, [number, number][]][] = [];
   private rows: number;
   private cols: number;
-  private language: string = 'English';
-  private dictionaries: Record<string, Dictionary>;
+  private language: Language = 'en';
+  private dictionaries: Record<Language, Dictionary>;
   private possibleInitWords: Record<string, string[][]> = {};
-  private initWord: string = '';
+  private initWord = '';
 
   constructor(rows: number, cols: number, grid?: string[][]) {
     this.rows = rows;
     this.cols = cols;
-    this.dictionaries = {
-      'English': {},
-      'Russian': {}
-    };
+    this.dictionaries = { en: {}, ru: {} };
     if (grid) {
       this.grid = grid;
     } else {
@@ -126,13 +125,10 @@ class Balda {
   }
 
   loadDictionary(nouns: object) {
-    const languageWords: Record<string, string[]> = {
-      English: [],
-      Russian: []
-    };
+    const languageWords: Record<Language, string[]> = { en: [], ru: [] };
     for (const word in nouns) {
       const lower = word.toLowerCase();
-      const language = /[a-z]/.test(lower) ? 'English' : 'Russian';
+      const language = /[a-z]/.test(lower) ? 'en' : 'ru';
       languageWords[language].push(lower);
       addWord(this.dictionaries[language], lower);
     }
@@ -140,7 +136,7 @@ class Balda {
       const initWords: string[][] = [];
         for (let i = 3; i <= 9; i++) {
           initWords[i] = [];
-          for (const word of languageWords[language]) {
+          for (const word of languageWords[language as Language]) {
             if (word.length === i) {
               initWords[i].push(word);
             }
@@ -150,7 +146,7 @@ class Balda {
     }
   }
 
-  reset(language?: string) {
+  reset(language?: Language) {
     if (language) {
       this.language = language;
     }

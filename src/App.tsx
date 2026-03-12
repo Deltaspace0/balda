@@ -1,20 +1,22 @@
 import './App.css';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Canvas from './components/Canvas';
 import LetterPanel from './components/LetterPanel';
 import { useListSlider, Slider } from './components/Slider';
 import WordList from './components/WordList';
 import Game from './Game';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type WordPaths = [string, [number, number][]][];
-type Language = 'English' | 'Russian';
-const languageLetters = {
-  'English': 'abcdefghijklmnopqrstuvwxyz',
-  'Russian': 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+type Language = 'en' | 'ru';
+const languageLetters: Record<Language, string> = {
+  'en': 'abcdefghijklmnopqrstuvwxyz',
+  'ru': 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 };
 
 function App() {
-  const [language, setLanguage] = useState<Language>('English');
+  const { t, i18n } = useTranslation();
+  const [language, setLanguage] = useState<Language>('en');
   const [letter, setLetter] = useState('a');
   const [editEnabled, setEditEnabled] = useState(false);
   const [twoPlayersMode, setTwoPlayersMode] = useState(false);
@@ -25,13 +27,13 @@ function App() {
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
   const rowProps = useListSlider({
-    label: 'Rows',
+    label: t('rows'),
     initialValue: 5,
     list: [3, 4, 5, 6, 7, 8, 9],
     callback: setRows
   });
   const colProps = useListSlider({
-    label: 'Columns',
+    label: t('columns'),
     initialValue: 5,
     list: [3, 4, 5, 6, 7, 8, 9],
     callback: setCols
@@ -98,6 +100,7 @@ function App() {
     setLanguage(language);
     setLetter(languageLetters[language][0]);
     game.setLanguage(language);
+    i18n.changeLanguage(language);
   };
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
@@ -122,14 +125,14 @@ function App() {
   return (<div className='App'>
     <div className='flex-column'>
       <fieldset style={{height: 'auto'}}>
-        <legend>Language</legend>
+        <legend>{t('language')}</legend>
         <label>
           <input
             type='radio'
             name='language'
             value='English'
-            checked={language === 'English'}
-            onChange={() => handleLanguage('English')}
+            checked={language === 'en'}
+            onChange={() => handleLanguage('en')}
           />
           <p>English</p>
         </label>
@@ -138,34 +141,51 @@ function App() {
             type='radio'
             name='language'
             value='Russian'
-            checked={language === 'Russian'}
-            onChange={() => handleLanguage('Russian')}
+            checked={language === 'ru'}
+            onChange={() => handleLanguage('ru')}
           />
-          <p>Russian</p>
+          <p>Русский</p>
         </label>
       </fieldset>
       <div className='flex-row'>
-        <button onClick={() => game.setDimensions(rows, cols)}>Reset game</button>
-        <button disabled={wordHistory.length === 0} onClick={() => game.undo()}>
-          Undo
+        <button onClick={() => game.setDimensions(rows, cols)}>
+          {t('reset-game')}
+        </button>
+        <button
+          disabled={wordHistory.length === 0}
+          onClick={() => game.undo()}
+        >
+          {t('undo')}
         </button>
       </div>
       <Slider {...rowProps}/>
       <Slider {...colProps}/>
       <label>
-        <input type='checkbox' checked={editEnabled} onChange={handleEditEnabled}/>
-        <p>Edit mode</p>
+        <input
+          type='checkbox'
+          checked={editEnabled}
+          onChange={handleEditEnabled}
+        />
+        <p>{t('edit-mode')}</p>
       </label>
       <label>
-        <input type='checkbox' checked={twoPlayersMode} onChange={(e) => setTwoPlayersMode(e.target.checked)}/>
-        <p>Two players</p>
+        <input
+          type='checkbox'
+          checked={twoPlayersMode}
+          onChange={(e) => setTwoPlayersMode(e.target.checked)}
+        />
+        <p>{t('two-players')}</p>
       </label>
       <label>
-        <input type='checkbox' checked={showPossible} onChange={(e) => setShowPossible(e.target.checked)}/>
-        <p>Show possible words</p>
+        <input
+          type='checkbox'
+          checked={showPossible}
+          onChange={(e) => setShowPossible(e.target.checked)}
+        />
+        <p>{t('show-possible-words')}</p>
       </label>
       {showPossible && <WordList
-        label='Possible words'
+        label={t('possible-words')}
         wordPaths={possibleWords}
         setHighlightIndex={(i) => game.setPossibleIndex(i)}
         onClick={(i) => {
@@ -178,28 +198,49 @@ function App() {
       />}
     </div>
     <div className='flex-column'>
-      <Canvas draw={draw} className='game-canvas' mouseHandlers={mouseHandlers}/>
+      <Canvas
+        draw={draw}
+        className='game-canvas'
+        mouseHandlers={mouseHandlers}
+      />
       <LetterPanel
         letters={languageLetters[language]}
         letter={letter}
         setLetter={handleLetter}/>
-      { status === 'add-letter' && <p className='status'>Add letter</p> }
-      { status === 'select-path' &&
-          <label>
-            <button className='button-auto' onClick={() => game.cancelNewLetter()}>Cancel</button>
-            <p>Select word path</p>
-          </label> }
-      { status === 'unknown-word' &&
-          <div>
-            <button className='button-auto' onClick={() => game.resolveUnknownWord(true)}>Add</button>
-            <button className='button-auto' onClick={() => game.resolveUnknownWord(false)}>Cancel</button>
-            <p className='status'>Unknown word: {game.getUnknownWord()}. Add it anyway?</p>
-          </div> }
+      { status === 'add-letter' && <p className='status'>
+        {t('add-letter')}
+      </p> }
+      { status === 'select-path' && <label>
+        <button
+          className='button-auto'
+          onClick={() => game.cancelNewLetter()}
+        >
+          {t('cancel')}
+        </button>
+        <p>{t('select-path')}</p>
+      </label> }
+      { status === 'unknown-word' && <div>
+        <button
+          className='button-auto'
+          onClick={() => game.resolveUnknownWord(true)}
+        >
+          {t('add')}
+        </button>
+        <button
+          className='button-auto'
+          onClick={() => game.resolveUnknownWord(false)}
+        >
+          {t('cancel')}
+        </button>
+        <p className='status'>
+          {t('unknown-word')}: {game.getUnknownWord()}. {t('add-it-anyway')}
+        </p>
+      </div> }
     </div>
     { twoPlayersMode ? (<>
       <div className='flex-column'>
         <WordList
-          label={`Player 1: ${score1}`}
+          label={`${t('player')} 1: ${score1}`}
           wordPaths={wordHistory1}
           setHighlightIndex={(i) => {
             game.setHighlightIndex(i !== undefined ? i*2 : i);
@@ -207,7 +248,7 @@ function App() {
         />
       </div>
       <WordList
-        label={`Player 2: ${score2}`}
+        label={`${t('player')} 2: ${score2}`}
         wordPaths={wordHistory2}
         setHighlightIndex={(i) => {
           game.setHighlightIndex(i !== undefined ? i*2+1 : i);
@@ -215,7 +256,7 @@ function App() {
       />
     </>) : (<div className='flex-column'>
       <WordList
-        label='Word history'
+        label={t('word-history')}
         wordPaths={wordHistory}
         setHighlightIndex={(i) => game.setHighlightIndex(i)}
         style={{userSelect: 'text'}}

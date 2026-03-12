@@ -164,7 +164,7 @@ class Game extends EventTarget {
     this.resetGame();
   }
 
-  setLanguage(language: string) {
+  setLanguage(language: 'en' | 'ru') {
     this.balda.reset(language);
     this.resetGame();
   }
