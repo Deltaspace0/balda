@@ -1,6 +1,7 @@
 import './App.css';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useLocalStorage from 'use-local-storage';
 import Canvas from './components/Canvas';
 import LetterPanel from './components/LetterPanel';
 import Slider from './components/Slider';
@@ -14,34 +15,25 @@ const languageLetters: Record<Language, string> = {
   'ru': 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 };
 
+function useStorage<T>(
+  key: string,
+  value: T
+): ReturnType<typeof useLocalStorage<T>> {
+  return useLocalStorage<T>(key, value, { syncData: false });
+}
+
 function App() {
-  const { t, i18n } = useTranslation();
-  const [language, setLanguage] = useState<Language>('en');
-  const [letter, setLetter] = useState('a');
+  const [language, setLanguage] = useStorage<Language>('language', 'en');
+  const [letter, setLetter] = useState(languageLetters[language][0]);
   const [editEnabled, setEditEnabled] = useState(false);
-  const [twoPlayersMode, setTwoPlayersMode] = useState(false);
-  const [showPossible, setShowPossible] = useState(true);
+  const [twoPlayers, setTwoPlayers] = useStorage('two-players', false);
+  const [showPossible, setShowPossible] = useStorage('show-possible', true);
   const [status, setStatus] = useState('add-letter');
   const [wordHistory, setWordHistory] = useState<WordPaths>([]);
   const [possibleWords, setPossibleWords] = useState<WordPaths>([]);
-  const [rows, setRows] = useState(5);
-  const [cols, setCols] = useState(5);
-  const handleRows = (newRows: number) => {
-    setRows(newRows);
-    localStorage.setItem('rows-cols', JSON.stringify([newRows, cols]));
-  };
-  const handleCols = (newCols: number) => {
-    setCols(newCols);
-    localStorage.setItem('rows-cols', JSON.stringify([rows, newCols]));
-  };
-  const handleTwoPlayersMode = (value: boolean) => {
-    setTwoPlayersMode(value);
-    localStorage.setItem('two-players-mode', JSON.stringify(value));
-  };
-  const handleShowPossible = (value: boolean) => {
-    setShowPossible(value);
-    localStorage.setItem('show-possible', JSON.stringify(value));
-  };
+  const [rows, setRows] = useStorage('rows', 5);
+  const [cols, setCols] = useStorage('cols', 5);
+  const { t, i18n } = useTranslation('translation', { lng: language });
   const [wordHistory1, wordHistory2, score1, score2] = useMemo(() => {
     const wordHistory1: WordPaths = [];
     const wordHistory2: WordPaths = [];
@@ -71,20 +63,27 @@ function App() {
     game.addEventListener('possible-words', (e) => {
       setPossibleWords((e as CustomEvent).detail);
     });
-    game.reset();
+    game.setLanguage(language);
+    game.setDimensions(rows, cols);
     gameRef.current = game;
   }
   const game = gameRef.current;
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     game.render(ctx);
   }, [game]);
+  const handleLanguage = useCallback((x: Language) => {
+    setLanguage(x);
+    setLetter(languageLetters[x][0]);
+    game.setLanguage(x);
+    i18n.changeLanguage(x);
+  }, [game, i18n, setLanguage]);
   const handleLetter = useCallback((x: string) => {
     game.setLetter(x);
     setLetter(x);
   }, [game]);
-  const handleEditEnabled = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    game.setEditEnabled(e.target.checked);
-    setEditEnabled(e.target.checked);
+  const handleEditEnabled = useCallback((x: boolean) => {
+    game.setEditEnabled(x);
+    setEditEnabled(x);
   }, [game]);
   const mouseHandlers = {
     onMouseMove: useCallback((e: MouseEvent) => {
@@ -100,39 +99,6 @@ function App() {
       game.mouseLeave();
     }, [game])
   };
-  const handleLanguage = useCallback((language: Language) => {
-    setLanguage(language);
-    setLetter(languageLetters[language][0]);
-    game.setLanguage(language);
-    i18n.changeLanguage(language);
-    localStorage.setItem('language', language);
-  }, [game, i18n]);
-  useLayoutEffect(() => {
-    const storedLanguage = localStorage.getItem('language');
-    if (storedLanguage && ['en', 'ru'].includes(storedLanguage)) {
-      handleLanguage(storedLanguage as Language);
-    }
-    const storedRowsCols = localStorage.getItem('rows-cols');
-    if (storedRowsCols) {
-      const rowsCols = JSON.parse(storedRowsCols);
-      if (rowsCols &&
-        typeof rowsCols[0] === 'number' &&
-        typeof rowsCols[1] === 'number'
-      ) {
-        setRows(rowsCols[0]);
-        setCols(rowsCols[1]);
-        game.setDimensions(rowsCols[0], rowsCols[1]);
-      }
-    }
-    const storedTwoPlayersMode = localStorage.getItem('two-players-mode');
-    if (storedTwoPlayersMode) {
-      setTwoPlayersMode(JSON.parse(storedTwoPlayersMode));
-    }
-    const storedShowPossible = localStorage.getItem('show-possible');
-    if (storedShowPossible) {
-      setShowPossible(JSON.parse(storedShowPossible));
-    }
-  }, [game, handleLanguage]);
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -193,27 +159,27 @@ function App() {
         label={t('rows')}
         list={[3, 4, 5, 6, 7, 8, 9]}
         value={rows}
-        setValue={handleRows}
+        setValue={setRows}
       />
       <Slider
         label={t('columns')}
         list={[3, 4, 5, 6, 7, 8, 9]}
         value={cols}
-        setValue={handleCols}
+        setValue={setCols}
       />
       <label>
         <input
           type='checkbox'
           checked={editEnabled}
-          onChange={handleEditEnabled}
+          onChange={(e) => handleEditEnabled(e.target.checked)}
         />
         <p>{t('edit-mode')}</p>
       </label>
       <label>
         <input
           type='checkbox'
-          checked={twoPlayersMode}
-          onChange={(e) => handleTwoPlayersMode(e.target.checked)}
+          checked={twoPlayers}
+          onChange={(e) => setTwoPlayers(e.target.checked)}
         />
         <p>{t('two-players')}</p>
       </label>
@@ -221,7 +187,7 @@ function App() {
         <input
           type='checkbox'
           checked={showPossible}
-          onChange={(e) => handleShowPossible(e.target.checked)}
+          onChange={(e) => setShowPossible(e.target.checked)}
         />
         <p>{t('show-possible-words')}</p>
       </label>
@@ -278,7 +244,7 @@ function App() {
         </p>
       </div> }
     </div>
-    { twoPlayersMode ? (<>
+    { twoPlayers ? (<>
       <div className='flex-column'>
         <WordList
           label={`${t('player')} 1: ${score1}`}
