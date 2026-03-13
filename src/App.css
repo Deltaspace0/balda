@@ -8,6 +8,7 @@
   --selected-bg: light-dark(#7d95ff, #30449e);
   --selected-hover: light-dark(#a9b8ff, #5669bf);
   --border: #6a86cd;
+  --element-border: 2px solid var(--border);
   --hover-border: #00b3ff;
   --gradient: linear-gradient(
     45deg,
@@ -57,7 +58,7 @@ input[type="checkbox"] {
   height: var(--size-element);
   margin: var(--margin);
   background: var(--element-bg);
-  border: 2px solid var(--border);
+  border: var(--element-border);
   cursor: pointer;
   outline: none;
   position: relative;
@@ -98,7 +99,7 @@ input[type="radio"] {
   height: var(--size-element);
   margin: var(--margin);
   background: var(--element-bg);
-  border: 2px solid var(--border);
+  border: var(--element-border);
   border-radius: 50%;
   cursor: pointer;
   outline: none;
@@ -139,10 +140,26 @@ input[type="range"] {
   &:disabled {
     cursor: not-allowed;
   }
-  &::-webkit-slider-runnable-track {
+  &::-moz-range-track {
+    box-sizing: border-box;
     height: var(--size-element);
     background: var(--element-bg);
-    border: 2px solid var(--border);
+    border: var(--element-border);
+  }
+  &::-webkit-slider-runnable-track {
+    box-sizing: border-box;
+    height: var(--size-element);
+    background: var(--element-bg);
+    border: var(--element-border);
+  }
+  &::-moz-range-thumb {
+    border: none;
+    box-shadow: none;
+    width: var(--size-element);
+    height: 13px;
+    border-radius: 4px;
+    background: var(--gradient);
+    cursor: pointer;
   }
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -151,13 +168,21 @@ input[type="range"] {
     border-radius: 4px;
     background: var(--gradient);
     cursor: pointer;
-    transition: all 0.2s ease;
+  }
+  &:hover::-moz-range-thumb {
+    transform: var(--element-transform);
   }
   &:hover::-webkit-slider-thumb {
     transform: var(--element-transform);
   }
+  &:active::-moz-range-thumb {
+    background: var(--active-gradient);
+  }
   &:active::-webkit-slider-thumb {
     background: var(--active-gradient);
+  }
+  &:disabled::-moz-range-thumb {
+    background: var(--main);
   }
   &:disabled::-webkit-slider-thumb {
     background: var(--main);
