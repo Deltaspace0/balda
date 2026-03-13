@@ -4,6 +4,9 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   en: {
     translation: {
+      'theme': 'Theme',
+      'light-mode': 'Light',
+      'dark-mode': 'Dark',
       'language': 'Language',
       'reset-game': 'Reset game',
       'undo': 'Undo word',
@@ -25,6 +28,9 @@ const resources = {
   },
   ru: {
     translation: {
+      'theme': 'Тема',
+      'light-mode': 'Светлая',
+      'dark-mode': 'Тёмная',
       'language': 'Язык',
       'reset-game': 'Сбросить',
       'undo': 'Отменить',

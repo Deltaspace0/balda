@@ -320,29 +320,32 @@ class Game extends EventTarget {
     this.hoveredCell = null;
   }
 
-  render(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  render(ctx: CanvasRenderingContext2D, darkMode?: boolean) {
+    ctx.fillStyle = darkMode ? '#111' : '#eee';
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     const dw = GAME_WIDTH/this.cols;
     const dh = GAME_HEIGHT/this.rows;
     ctx.font = `${Math.floor(Math.min(dw, dh)*0.6)}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.strokeStyle = this.editEnabled ? '#cef411' : '#ddd';
+    const mainColor = darkMode ? '#ddd' : '#222';
+    const editColor = darkMode ? '#cef411' : '#3b9400';
+    ctx.strokeStyle = this.editEnabled ? editColor : mainColor;
     if (this.hoveredCell) {
       const [row, col] = this.hoveredCell;
-      ctx.fillStyle = '#323035';
+      ctx.fillStyle = darkMode ? '#323035' : '#e3fff3';
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
     if (this.newCell) {
       const [row, col] = this.newCell;
-      ctx.fillStyle = '#36335d';
+      ctx.fillStyle = darkMode ? '#36335d' : '#b9ffe4';
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
     for (const [row, col] of this.wordPath) {
-      ctx.fillStyle = '#4d4e08';
+      ctx.fillStyle = darkMode ? '#4d4e08' : '#fdffa1';
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
-    ctx.fillStyle = '#ddd';
+    ctx.fillStyle = mainColor;
     drawPathArrows(ctx, this.wordPath, dw, dh);
     if (this.highlightIndex !== null) {
       drawPathArrows(ctx, this.wordHistory[this.highlightIndex][1], dw, dh);

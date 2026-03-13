@@ -1,17 +1,22 @@
 :root {
-  --dark-bg: #0a111e;
-  --dark-element-bg: #0f0718;
-  --dark-element-hover: #28234e;
-  --dark-element-active: #000000;
-  --dark-selected-bg: #30449e;
-  --dark-selected-hover: #5669bf;
-  --dark-highlight: #0ec3c9;
-  --dark-border: #6a86cd;
-  --dark-hover-border: #00b3ff;
-  --dark-gradient: linear-gradient(45deg, #00b3ff, #00f2ff);
-  --dark-active: #0048ff;
-  --dark-active-gradient: linear-gradient(45deg, var(--dark-active), #00b3ff);
-  --white: #ddd;
+  color-scheme: light dark;
+  --bg: light-dark(#cee0ff, #0a111e);
+  --highlight: light-dark(#0055ff, #0ec3c9);
+  --element-bg: light-dark(#c1cbff, #0f0718);
+  --element-hover: light-dark(#e0e6ff, #28234e);
+  --element-active: light-dark(#6483ff, #000);
+  --selected-bg: light-dark(#7d95ff, #30449e);
+  --selected-hover: light-dark(#a9b8ff, #5669bf);
+  --border: #6a86cd;
+  --hover-border: #00b3ff;
+  --gradient: linear-gradient(
+    45deg,
+    light-dark(#2b8cb6, #00b3ff),
+    light-dark(#00c7d1, #00f2ff)
+  );
+  --active: #0048ff;
+  --active-gradient: linear-gradient(45deg, var(--active), #00b3ff);
+  --main: light-dark(#222, #ddd);
   --element-transform: scale(1.2);
   --margin: 4px;
   --size-element: 16px;
@@ -19,14 +24,14 @@
 
 * {
   outline: none;
-  scrollbar-color: var(--white) #0000;
+  scrollbar-color: var(--main) #0000;
   scrollbar-width: thin;
 }
 
 a {
   cursor: pointer;
   &:hover {
-    color: var(--dark-highlight);
+    color: var(--highlight);
   }
 }
 
@@ -35,7 +40,7 @@ label {
   align-items: center;
   cursor: pointer;
   &:hover {
-    color: var(--dark-highlight);
+    color: var(--highlight);
   }
   & > p {
     text-overflow: ellipsis;
@@ -51,20 +56,20 @@ input[type="checkbox"] {
   width: var(--size-element);
   height: var(--size-element);
   margin: var(--margin);
-  background: var(--dark-element-bg);
-  border: 2px solid var(--dark-border);
+  background: var(--element-bg);
+  border: 2px solid var(--border);
   cursor: pointer;
   outline: none;
   position: relative;
   flex-shrink: 0;
   &:hover {
-    background: var(--dark-element-hover);
-    border-color: var(--dark-hover-border);
+    background: var(--element-hover);
+    border-color: var(--hover-border);
     transform: var(--element-transform);
   }
   &:active {
-    background: var(--dark-element-active);
-    border-color: var(--dark-active);
+    background: var(--element-active);
+    border-color: var(--active);
     transform: var(--element-transform);
   }
   &:checked::before,
@@ -75,7 +80,7 @@ input[type="checkbox"] {
     left: 50%;
     width: 12px;
     height: 2px;
-    background: var(--dark-gradient);
+    background: var(--gradient);
     transform: translate(-50%, -50%);
   }
   &:checked::before {
@@ -92,8 +97,8 @@ input[type="radio"] {
   width: var(--size-element);
   height: var(--size-element);
   margin: var(--margin);
-  background: var(--dark-element-bg);
-  border: 2px solid var(--dark-border);
+  background: var(--element-bg);
+  border: 2px solid var(--border);
   border-radius: 50%;
   cursor: pointer;
   outline: none;
@@ -101,13 +106,13 @@ input[type="radio"] {
   box-sizing: border-box;
   flex-shrink: 0;
   &:hover {
-    background: var(--dark-element-hover);
-    border-color: var(--dark-hover-border);
+    background: var(--element-hover);
+    border-color: var(--hover-border);
     transform: var(--element-transform);
   }
   &:active {
-    background: var(--dark-element-active);
-    border-color: var(--dark-active);
+    background: var(--element-active);
+    border-color: var(--active);
     transform: var(--element-transform);
   }
   &:checked::after {
@@ -117,7 +122,7 @@ input[type="radio"] {
     left: 50%;
     width: 8px;
     height: 8px;
-    background: var(--dark-gradient);
+    background: var(--gradient);
     border-radius: 50%;
     transform: translate(-50%, -50%);
   }
@@ -136,15 +141,15 @@ input[type="range"] {
   }
   &::-webkit-slider-runnable-track {
     height: var(--size-element);
-    background: var(--dark-element-bg);
-    border: 2px solid var(--dark-border);
+    background: var(--element-bg);
+    border: 2px solid var(--border);
   }
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: var(--size-element);
     height: 13px;
     border-radius: 4px;
-    background: var(--dark-gradient);
+    background: var(--gradient);
     cursor: pointer;
     transition: all 0.2s ease;
   }
@@ -152,10 +157,10 @@ input[type="range"] {
     transform: var(--element-transform);
   }
   &:active::-webkit-slider-thumb {
-    background: var(--dark-active-gradient);
+    background: var(--active-gradient);
   }
   &:disabled::-webkit-slider-thumb {
-    background: var(--white);
+    background: var(--main);
   }
 }
 
@@ -164,30 +169,31 @@ button {
   width: 100%;
   margin: var(--margin);
   padding: 6px;
-  background: var(--dark-element-bg);
-  color: var(--white);
-  border: 1px solid var(--dark-border);
+  background: var(--element-bg);
+  color: var(--main);
+  border: 1px solid var(--border);
   cursor: pointer;
   &:hover {
-    background: var(--dark-element-hover);
-    border: 1px solid var(--dark-hover-border);
+    background: var(--element-hover);
+    border: 1px solid var(--hover-border);
   }
   &:active {
-    background: var(--dark-element-active);
-    border: 1px solid var(--dark-active);
+    background: var(--element-active);
+    border: 1px solid var(--active);
   }
   &:disabled {
     cursor: not-allowed;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.3);
-    background: var(--dark-element-bg);
+    border: 1px solid var(--main);
+    color: var(--main);
+    opacity: 0.5;
+    background: var(--element-bg);
   }
 }
 
 fieldset {
   margin: var(--margin);
   min-width: 160px;
-  height: 240px;
+  height: 120px;
   overflow: auto;
 }
 
@@ -198,7 +204,7 @@ ol {
 li {
   transition: color 0.3s ease-out;
   &:hover {
-    color: var(--dark-highlight);
+    color: var(--highlight);
     cursor: pointer;
     transition: none;
   }
@@ -218,12 +224,12 @@ p {
 }
 
 .App {
-  background: var(--dark-bg);
+  background: var(--bg);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--white);
+  color: var(--main);
   user-select: none;
 }
 
@@ -256,12 +262,12 @@ p {
 .letter-selected {
   margin: 0px;
   width: 36px;
-  background-color: var(--dark-selected-bg);
+  background-color: var(--selected-bg);
   &:hover {
-    background: var(--dark-selected-hover);
+    background: var(--selected-hover);
   }
   &:active {
-    background: var(--dark-selected-bg);
+    background: var(--selected-bg);
   }
 }
 

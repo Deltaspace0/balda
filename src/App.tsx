@@ -3,12 +3,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useLocalStorage from 'use-local-storage';
 import Canvas from './components/Canvas';
+import FieldsetRadio from './components/FieldsetRadio';
 import LetterPanel from './components/LetterPanel';
 import Slider from './components/Slider';
 import WordList from './components/WordList';
 import Game from './Game';
 
 type WordPaths = [string, [number, number][]][];
+type Theme = 'dark' | 'light';
 type Language = 'en' | 'ru';
 const languageLetters: Record<Language, string> = {
   'en': 'abcdefghijklmnopqrstuvwxyz',
@@ -23,6 +25,12 @@ function useStorage<T>(
 }
 
 function App() {
+  const [theme, setTheme] = useStorage<Theme>(
+    'theme',
+    window.matchMedia?.("(prefers-color-scheme: dark)")?.matches
+      ? 'dark'
+      : 'light'
+  );
   const [language, setLanguage] = useStorage<Language>('language', 'en');
   const [letter, setLetter] = useState(languageLetters[language][0]);
   const [editEnabled, setEditEnabled] = useState(false);
@@ -69,8 +77,8 @@ function App() {
   }
   const game = gameRef.current;
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
-    game.render(ctx);
-  }, [game]);
+    game.render(ctx, theme === 'dark');
+  }, [game, theme]);
   const handleLanguage = useCallback((x: Language) => {
     setLanguage(x);
     setLetter(languageLetters[x][0]);
@@ -100,6 +108,9 @@ function App() {
     }, [game])
   };
   useEffect(() => {
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
+  useEffect(() => {
     const listener = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         game.cancelNewLetter();
@@ -122,29 +133,20 @@ function App() {
   return (<div className='App'>
     <div className='flex-row' style={{alignItems: 'flex-start'}}>
       <div className='flex-column'>
-        <fieldset style={{height: 'auto'}}>
-          <legend>{t('language')}</legend>
-          <label>
-            <input
-              type='radio'
-              name='language'
-              value='English'
-              checked={language === 'en'}
-              onChange={() => handleLanguage('en')}
-            />
-            <p>English</p>
-          </label>
-          <label>
-            <input
-              type='radio'
-              name='language'
-              value='Russian'
-              checked={language === 'ru'}
-              onChange={() => handleLanguage('ru')}
-            />
-            <p>Русский</p>
-          </label>
-        </fieldset>
+        <FieldsetRadio
+          name='theme'
+          title={t('theme')}
+          list={[['light', t('light-mode')], ['dark', t('dark-mode')]]}
+          value={theme}
+          setValue={setTheme}
+        />
+        <FieldsetRadio
+          name='language'
+          title={t('language')}
+          list={[['en', 'English'], ['ru', 'Русский']]}
+          value={language}
+          setValue={handleLanguage}
+        />
         <div className='flex-row'>
           <button onClick={() => game.setDimensions(rows, cols)}>
             {t('reset-game')}
