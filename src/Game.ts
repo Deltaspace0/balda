@@ -327,7 +327,7 @@ class Game extends EventTarget {
     ctx.font = `${Math.floor(Math.min(dw, dh)*0.6)}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.strokeStyle = this.editEnabled ? '#cef411' : '#ffffff';
+    ctx.strokeStyle = this.editEnabled ? '#cef411' : '#ddd';
     if (this.hoveredCell) {
       const [row, col] = this.hoveredCell;
       ctx.fillStyle = '#323035';
@@ -342,7 +342,7 @@ class Game extends EventTarget {
       ctx.fillStyle = '#4d4e08';
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#ddd';
     drawPathArrows(ctx, this.wordPath, dw, dh);
     if (this.highlightIndex !== null) {
       drawPathArrows(ctx, this.wordHistory[this.highlightIndex][1], dw, dh);
