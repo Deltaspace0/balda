@@ -44,6 +44,28 @@ function drawPathArrows(
   }
 }
 
+function drawPathCells(
+  ctx: CanvasRenderingContext2D,
+  path: [number, number][],
+  dw: number,
+  dh: number,
+  startColor: string,
+  middleColor: string,
+  endColor: string
+) {
+  const [startRow, startCol] = path[0];
+  ctx.fillStyle = startColor;
+  ctx.fillRect(dw*startCol, dh*startRow, dw, dh);
+  ctx.fillStyle = middleColor;
+  for (let i = 1; i < path.length-1; i++) {
+    const [row, col] = path[i];
+    ctx.fillRect(dw*col, dh*row, dw, dh);
+  }
+  const [endRow, endCol] = path[path.length-1];
+  ctx.fillStyle = endColor;
+  ctx.fillRect(dw*endCol, dh*endRow, dw, dh);
+}
+
 class Game extends EventTarget {
   private rows: number;
   private cols: number;
@@ -341,32 +363,44 @@ class Game extends EventTarget {
     ctx.textBaseline = 'middle';
     const mainColor = darkMode ? '#ddd' : '#222';
     const editColor = darkMode ? '#cef411' : '#3b9400';
+    const newColor = darkMode ? '#36335d' : '#b9ffe4';
+    const pathColor = darkMode ? '#323035' : '#e3fff3';
+    const color1 = darkMode ? '#414e08' : '#e9ffa1';
+    const color3 = darkMode ? '#4e4208' : '#ffeca1';
     ctx.strokeStyle = this.editEnabled ? editColor : mainColor;
     if (this.hoveredCell) {
       const [row, col] = this.hoveredCell;
-      ctx.fillStyle = darkMode ? '#323035' : '#e3fff3';
+      ctx.fillStyle = pathColor;
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
     if (this.newCell) {
       const [row, col] = this.newCell;
-      ctx.fillStyle = darkMode ? '#36335d' : '#b9ffe4';
+      ctx.fillStyle = newColor;
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
     for (const [row, col] of this.wordPath) {
-      ctx.fillStyle = darkMode ? '#4d4e08' : '#fdffa1';
+      ctx.fillStyle = pathColor;
       ctx.fillRect(dw*col, dh*row, dw, dh);
     }
     ctx.fillStyle = mainColor;
     drawPathArrows(ctx, this.wordPath, dw, dh);
     if (this.highlightIndex !== null) {
-      drawPathArrows(ctx, this.wordHistory[this.highlightIndex][1], dw, dh);
+      const path = this.wordHistory[this.highlightIndex][1];
+      drawPathCells(ctx, path, dw, dh, color1, pathColor, color3);
+      ctx.fillStyle = mainColor;
+      drawPathArrows(ctx, path, dw, dh);
     }
     if (this.possibleIndex !== null) {
       if (this.possibleIndex < this.balda.possibleWords.length) {
         const [word, path] = this.balda.possibleWords[this.possibleIndex];
+        drawPathCells(ctx, path, dw, dh, color1, pathColor, color3);
+        ctx.fillStyle = mainColor;
         for (let i = 0; i < word.length; i++) {
           const [row, col] = path[i];
           if (this.balda.grid[row][col] === '') {
+            ctx.fillStyle = newColor;
+            ctx.fillRect(dw*col, dh*row, dw, dh);
+            ctx.fillStyle = mainColor;
             ctx.fillText(word[i], dw*(col+0.5), dh*(row+0.5));
             break;
           }
