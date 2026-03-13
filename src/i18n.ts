@@ -20,8 +20,7 @@ const resources = {
       'player': 'Player',
       'add-letter': 'Add letter',
       'select-path': 'Select path',
-      'unknown-word': 'Unknown word',
-      'add-it-anyway': 'Add it anyway?',
+      'unknown-word': 'Unknown word: {{word}}. Add it anyway?',
       'add': 'Add',
       'cancel': 'Cancel'
     }
@@ -44,8 +43,7 @@ const resources = {
       'player': 'Игрок',
       'add-letter': 'Добавьте букву',
       'select-path': 'Покажите слово',
-      'unknown-word': 'Неизвестное слово',
-      'add-it-anyway': 'Всё равно добавить?',
+      'unknown-word': 'Неизвестное слово: {{word}}. Всё равно добавить?',
       'add': 'Добавить',
       'cancel': 'Отмена'
     }

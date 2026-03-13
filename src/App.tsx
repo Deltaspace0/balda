@@ -233,7 +233,7 @@ function App() {
           { status === 'unknown-word' && <>
             <div className='flex-row'>
               <p className='status'>
-                {t('unknown-word')}: {game.getUnknownWord()}. {t('add-it-anyway')}
+                {t('unknown-word', { word: game.getUnknownWord() })}
               </p>
             </div>
             <div className='flex-row'>
