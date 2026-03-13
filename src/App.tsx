@@ -264,6 +264,8 @@ function App() {
             setHighlightIndex={(i) => {
               game.setHighlightIndex(i !== undefined ? i*2 : i);
             }}
+            scrollToBottom={true}
+            style={{userSelect: 'text'}}
           />
           <WordList
             label={`${t('player')} 2: ${score2}`}
@@ -271,6 +273,8 @@ function App() {
             setHighlightIndex={(i) => {
               game.setHighlightIndex(i !== undefined ? i*2+1 : i);
             }}
+            scrollToBottom={true}
+            style={{userSelect: 'text'}}
           />
         </div>
       </>) : (<div className='flex-column'>
@@ -278,6 +282,7 @@ function App() {
           label={t('word-history')}
           wordPaths={wordHistory}
           setHighlightIndex={(i) => game.setHighlightIndex(i)}
+          scrollToBottom={true}
           style={{userSelect: 'text', height: '400px'}}
         />
       </div>) }
