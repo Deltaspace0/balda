@@ -197,13 +197,16 @@ function App() {
         {showPossible && <WordList
           label={t('possible-words')}
           wordPaths={possibleWords}
-          setHighlightIndex={(i) => game.setPossibleIndex(i)}
-          onClick={(i) => {
-            if (status !== 'add-letter') {
-              return;
+          setHighlightIndex={(i) => {
+            if (status === 'add-letter') {
+              game.setPossibleIndex(i);
             }
-            game.selectPossibleWord(i);
-            game.setPossibleIndex();
+          }}
+          onClick={(i) => {
+            if (status === 'add-letter') {
+              game.selectPossibleWord(i);
+              game.setPossibleIndex();
+            }
           }}
         />}
       </div>

@@ -2,7 +2,13 @@ import Balda from './Balda';
 import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 import nouns from './nouns.json' with { type: 'json' };
 
-function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
+function drawArrow(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+) {
   const a = Math.atan2(y2-y1, x2-x1);
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
@@ -11,7 +17,12 @@ function drawArrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: nu
   ctx.lineTo(x2-10*Math.cos(a+Math.PI/6), y2-10*Math.sin(a+Math.PI/6));
 }
 
-function drawPathArrows(ctx: CanvasRenderingContext2D, path: [number, number][], dw: number, dh: number) {
+function drawPathArrows(
+  ctx: CanvasRenderingContext2D,
+  path: [number, number][],
+  dw: number,
+  dh: number
+) {
   for (let i = 0; i < path.length-1; i++) {
     const [row1, col1] = path[i];
     const [row2, col2] = path[i+1];
