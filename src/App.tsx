@@ -279,7 +279,7 @@ function App() {
         </div>
       </>) : (<div className='flex-column'>
         <WordList
-          label={t('word-history')}
+          label={`${t('word-history')}: ${score1+score2}`}
           wordPaths={wordHistory}
           setHighlightIndex={(i) => game.setHighlightIndex(i)}
           scrollToBottom={true}
