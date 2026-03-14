@@ -32,14 +32,7 @@ class Balda {
     if (grid) {
       this.grid = grid;
     } else {
-      this.resetGrid();
-    }
-  }
-
-  private resetGrid() {
-    this.grid = [];
-    for (let i = 0; i < this.rows; i++) {
-      this.grid.push(Array(this.cols).fill(''));
+      this.clearGrid();
     }
   }
 
@@ -150,11 +143,18 @@ class Balda {
     }
   }
 
+  clearGrid() {
+    this.grid = [];
+    for (let i = 0; i < this.rows; i++) {
+      this.grid.push(Array(this.cols).fill(''));
+    }
+  }
+
   reset(language?: Language, initWord?: string) {
     if (language) {
       this.language = language;
     }
-    this.resetGrid();
+    this.clearGrid();
     if (!initWord) {
       const initWords = this.possibleInitWords[this.language][this.cols];
       if (initWords.length === 0) {
@@ -187,6 +187,10 @@ class Balda {
     this.initWord = '';
     const y = Math.floor(this.rows/2);
     for (let i = 0; i < this.cols; i++) {
+      if (this.grid[y][i] === '') {
+        this.initWord = '';
+        break;
+      }
       this.initWord += this.grid[y][i];
     }
     this.generatePossibleWords();

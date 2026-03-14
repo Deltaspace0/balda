@@ -178,6 +178,9 @@ function App() {
           />
           <p>{t('edit-mode')}</p>
         </label>
+        { editEnabled && <div className='flex-row'>
+          <button onClick={() => game.clear()}>{t('clear')}</button>
+        </div> }
         <label>
           <input
             type='checkbox'
@@ -194,7 +197,7 @@ function App() {
           />
           <p>{t('show-possible-words')}</p>
         </label>
-        {showPossible && <WordList
+        { showPossible && <WordList
           label={t('possible-words')}
           wordPaths={possibleWords}
           setHighlightIndex={(i) => {
@@ -208,7 +211,7 @@ function App() {
               game.setPossibleIndex();
             }
           }}
-        />}
+        /> }
       </div>
       <div className='flex-column'>
         <Canvas

@@ -185,6 +185,11 @@ class Game extends EventTarget {
     this.update();
   }
 
+  clear() {
+    this.balda.clearGrid();
+    this.resetGame();
+  }
+
   reset(initWord?: string) {
     if (initWord) {
       this.balda.reset(/[a-z]/.test(initWord) ? 'en' : 'ru', initWord);
