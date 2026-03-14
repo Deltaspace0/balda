@@ -150,19 +150,21 @@ class Balda {
     }
   }
 
-  reset(language?: Language) {
+  reset(language?: Language, initWord?: string) {
     if (language) {
       this.language = language;
     }
     this.resetGrid();
-    const initWords = this.possibleInitWords[this.language][this.cols];
-    if (initWords.length === 0) {
-      return;
+    if (!initWord) {
+      const initWords = this.possibleInitWords[this.language][this.cols];
+      if (initWords.length === 0) {
+        return;
+      }
+      initWord = initWords[Math.floor(Math.random()*initWords.length)];
     }
-    const word = initWords[Math.floor(Math.random()*initWords.length)];
     const y = Math.floor(this.rows/2);
     for (let i = 0; i < this.cols; i++) {
-      this.grid[y][i] = word[i];
+      this.grid[y][i] = initWord[i];
     }
   }
 

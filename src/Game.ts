@@ -90,7 +90,7 @@ class Game extends EventTarget {
     this.balda.loadDictionary(nouns);
   }
 
-  private getGridCoordinates(x: number, y: number) {
+  private getGridCoordinates(x: number, y: number): [number, number] {
     const row = Math.floor(y/GAME_HEIGHT*this.rows);
     const col = Math.floor(x/GAME_WIDTH*this.cols);
     return [row, col];
@@ -185,8 +185,12 @@ class Game extends EventTarget {
     this.update();
   }
 
-  reset() {
-    this.balda.reset();
+  reset(initWord?: string) {
+    if (initWord) {
+      this.balda.reset(/[a-z]/.test(initWord) ? 'en' : 'ru', initWord);
+    } else {
+      this.balda.reset();
+    }
     this.resetGame();
   }
 
@@ -219,6 +223,13 @@ class Game extends EventTarget {
 
   setLetter(letter: string) {
     this.letter = letter;
+  }
+
+  getLetterOnGrid(row: number, col: number): string {
+    if (row >= this.rows || row < 0 || col >= this.cols || col < 0) {
+      throw new Error(`Invalid coordinates: (${row}, ${col})`);
+    }
+    return this.balda.grid[row][col];
   }
 
   setEditEnabled(enabled: boolean) {
