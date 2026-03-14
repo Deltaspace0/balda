@@ -17,6 +17,7 @@ function addWord(dictionary: Dictionary, word: string) {
 class Balda {
   grid: string[][] = [];
   possibleWords: [string, [number, number][]][] = [];
+  possibleWordsAll: [string, [number, number][]][] = [];
   private rows: number;
   private cols: number;
   private language: Language = 'en';
@@ -43,6 +44,7 @@ class Balda {
   }
 
   private addPossibleWord(word: string, path: [number, number][]) {
+    this.possibleWordsAll.push([word, path]);
     for (const x of this.possibleWords) {
       if (x[0] === word) {
         return;
@@ -68,7 +70,11 @@ class Balda {
     return neighborCells;
   }
 
-  private generatePossibleWordsFromPath(path: [number, number][], dictionary: Dictionary, addedNewLetter: boolean) {
+  private generateFromPath(
+    path: [number, number][],
+    dictionary: Dictionary,
+    addedNewLetter: boolean
+  ) {
     const [lastRow, lastCol] = path[path.length-1];
     if (addedNewLetter && ('' in dictionary)) {
       this.addPossibleWord(this.getWordFromPath(path), path);
@@ -80,7 +86,7 @@ class Balda {
           continue;
         }
         this.grid[lastRow][lastCol] = nextLetter;
-        this.generatePossibleWordsFromPath([...path], dictionary[nextLetter], true);
+        this.generateFromPath([...path], dictionary[nextLetter], true);
       }
       this.grid[lastRow][lastCol] = '';
       return;
@@ -96,22 +102,20 @@ class Balda {
       if (visited) {
         continue;
       }
-      const letter = this.grid[row][col];
-      if (letter === '' && addedNewLetter) {
-        continue;
-      }
-      if (letter !== '' && !(letter in dictionary)) {
+      const l = this.grid[row][col];
+      if (l === '' && addedNewLetter || l !== '' && !(l in dictionary)) {
         continue;
       }
       const nextPath: [number, number][] = [...path, [row, col]];
-      const nextDictionary = letter === '' ? dictionary : dictionary[letter];
-      this.generatePossibleWordsFromPath(nextPath, nextDictionary, addedNewLetter);
+      const nextDictionary = l === '' ? dictionary : dictionary[l];
+      this.generateFromPath(nextPath, nextDictionary, addedNewLetter);
     }
   }
 
   private generatePossibleWords() {
     const dictionary = this.dictionaries[this.language];
     this.possibleWords = [];
+    this.possibleWordsAll = [];
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         const l = this.grid[i][j];
@@ -119,7 +123,7 @@ class Balda {
           continue;
         }
         const subDictionary = l === '' ? dictionary : dictionary[l];
-        this.generatePossibleWordsFromPath([[i, j]], subDictionary, false);
+        this.generateFromPath([[i, j]], subDictionary, false);
       }
     }
   }
@@ -166,6 +170,15 @@ class Balda {
     this.rows = rows;
     this.cols = cols;
     this.reset();
+  }
+
+  setGrid(grid: string[][]) {
+    if (!this.grid.length || !this.grid[0].length) {
+      throw new Error('Invalid grid');
+    }
+    this.grid = grid;
+    this.rows = this.grid.length;
+    this.cols = this.grid[0].length;
   }
 
   update() {
