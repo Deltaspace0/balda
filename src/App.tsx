@@ -79,16 +79,16 @@ function App() {
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     game.render(ctx, theme === 'dark');
   }, [game, theme]);
-  const handleLanguage = useCallback((x: Language) => {
-    setLanguage(x);
-    setLetter(languageLetters[x][0]);
-    game.setLanguage(x);
-    i18n.changeLanguage(x);
-  }, [game, i18n, setLanguage]);
   const handleLetter = useCallback((x: string) => {
     game.setLetter(x);
     setLetter(x);
   }, [game]);
+  const handleLanguage = useCallback((x: Language) => {
+    setLanguage(x);
+    handleLetter(languageLetters[x][0]);
+    game.setLanguage(x);
+    i18n.changeLanguage(x);
+  }, [game, i18n, setLanguage, handleLetter]);
   const handleEditEnabled = useCallback((x: boolean) => {
     game.setEditEnabled(x);
     setEditEnabled(x);
