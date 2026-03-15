@@ -96,8 +96,6 @@ class Game extends EventTarget {
     this.cols = cols;
     this.balda = new Balda(options);
     this.balda.loadDictionary(nouns);
-    this.balda.reset();
-    this.resetGame();
   }
 
   private getGridCoordinates(x: number, y: number): [number, number] {

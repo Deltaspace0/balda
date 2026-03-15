@@ -71,6 +71,7 @@ function App() {
       setPossibleWords((e as CustomEvent).detail);
     });
     game.setLetter(letter);
+    game.reset();
     gameRef.current = game;
   }
   const game = gameRef.current;
