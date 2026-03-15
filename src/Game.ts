@@ -70,7 +70,7 @@ class Game extends EventTarget {
   private rows: number;
   private cols: number;
   private balda: Balda;
-  private letter = 'а';
+  private letter = 'a';
   private editEnabled = false;
   private selectingPath = false;
   private unknownWord: string | null = null;

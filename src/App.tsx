@@ -71,6 +71,7 @@ function App() {
     game.addEventListener('possible-words', (e) => {
       setPossibleWords((e as CustomEvent).detail);
     });
+    game.setLetter(letter);
     game.setLanguage(language);
     game.setDimensions(rows, cols);
     gameRef.current = game;
