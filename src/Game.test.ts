@@ -72,6 +72,24 @@ describe('Game', () => {
       game.cancelNewLetter();
       expect(status).toBe('add-letter');
     });
+
+    it('should change letter and keep select-path status', () => {
+      game.setLetter('q');
+      mouseClick(3, 2);
+      game.setLetter('w');
+      expect(status).toBe('select-path');
+      expect(game.getLetterOnGrid(3, 2)).toBe('w');
+    });
+
+    it('should put letter to different cell', () => {
+      game.setLetter('q');
+      mouseClick(3, 2);
+      game.setLetter('w');
+      mouseClick(3, 4);
+      expect(status).toBe('select-path');
+      expect(game.getLetterOnGrid(3, 2)).toBe('');
+      expect(game.getLetterOnGrid(3, 4)).toBe('w');
+    });
   });
 
   describe('path selection', () => {
@@ -155,6 +173,39 @@ describe('Game', () => {
       expect(status).toBe('add-letter');
       expect(wordHistory).toEqual([[
         'coast',
+        [[1, 1], [2, 1], [2, 2], [2, 3], [2, 4]]
+      ]]);
+    });
+
+    it('should accept word without mouse click on first letter', () => {
+      game.reset('toast');
+      game.setLetter('c');
+      mouseDown(1, 1);
+      mouseMove(2, 1);
+      mouseMove(2, 2);
+      mouseMove(2, 3);
+      mouseMove(2, 4);
+      game.mouseUp();
+      expect(status).toBe('add-letter');
+      expect(wordHistory).toEqual([[
+        'coast',
+        [[1, 1], [2, 1], [2, 2], [2, 3], [2, 4]]
+      ]]);
+    });
+
+    it('should accept word with new letter changed during selection', () => {
+      game.reset('toast');
+      game.setLetter('d');
+      mouseDown(1, 1);
+      mouseMove(2, 1);
+      mouseMove(2, 2);
+      mouseMove(2, 3);
+      game.setLetter('r');
+      mouseMove(2, 4);
+      game.mouseUp();
+      expect(status).toBe('add-letter');
+      expect(wordHistory).toEqual([[
+        'roast',
         [[1, 1], [2, 1], [2, 2], [2, 3], [2, 4]]
       ]]);
     });

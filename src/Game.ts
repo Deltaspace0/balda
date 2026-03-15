@@ -244,6 +244,10 @@ class Game extends EventTarget {
 
   setLetter(letter: string) {
     this.letter = letter;
+    if (this.newCell) {
+      const [row, col] = this.newCell;
+      this.balda.grid[row][col] = letter;
+    }
   }
 
   getLetterOnGrid(row: number, col: number): string {
@@ -355,17 +359,21 @@ class Game extends EventTarget {
       this.update();
       return;
     }
+    if (currentLetter === '') {
+      if (this.newCell) {
+        const [prevRow, prevCol] = this.newCell;
+        this.balda.grid[prevRow][prevCol] = '';
+      }
+      this.balda.grid[row][col] = this.letter;
+      this.setNewCell([row, col]);
+    }
     if (this.newCell) {
-      if (currentLetter === '' || this.unknownWord !== null) {
+      if (this.balda.grid[row][col] === '' || this.unknownWord !== null) {
         return;
       }
       this.selectingPath = true;
       this.wordPath = [[row, col]];
       return;
-    }
-    if (currentLetter === '') {
-      this.balda.grid[row][col] = this.letter;
-      this.setNewCell([row, col]);
     }
   }
 
