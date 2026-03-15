@@ -3,15 +3,10 @@ import { useRef, useEffect } from 'react';
 interface CanvasProps {
   draw: (ctx: CanvasRenderingContext2D, dt: number) => void;
   className?: string;
-  mouseHandlers?: {
-    onMouseMove?: (event: MouseEvent) => void;
-    onMouseUp?: (event: MouseEvent) => void;
-    onMouseDown?: (event: MouseEvent) => void;
-    onMouseLeave?: () => void;
-  };
+  effect?: (canvas: HTMLCanvasElement) => (() => void);
 }
 
-function Canvas({ draw, className, mouseHandlers }: CanvasProps) {
+function Canvas({ draw, className, effect }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastTimeRef = useRef<number>(0);
   useEffect(() => {
@@ -39,37 +34,16 @@ function Canvas({ draw, className, mouseHandlers }: CanvasProps) {
       animationFrameId = window.requestAnimationFrame(render);
     };
     render(0);
-    if (mouseHandlers?.onMouseMove) {
-      canvas.addEventListener('mousemove', mouseHandlers.onMouseMove);
-    }
-    if (mouseHandlers?.onMouseDown) {
-      canvas.addEventListener('mousedown', mouseHandlers.onMouseDown);
-    }
-    if (mouseHandlers?.onMouseUp) {
-      canvas.addEventListener('mouseup', mouseHandlers.onMouseUp);
-    }
-    if (mouseHandlers?.onMouseLeave) {
-      canvas.addEventListener('mouseleave', mouseHandlers.onMouseLeave);
+    let effectCleanup = () => {};
+    if (effect) {
+      effectCleanup = effect(canvas);
     }
     return () => {
       window.cancelAnimationFrame(animationFrameId);
-      if (mouseHandlers?.onMouseMove) {
-        canvas.removeEventListener('mousemove', mouseHandlers.onMouseMove);
-      }
-      if (mouseHandlers?.onMouseDown) {
-        canvas.removeEventListener('mousedown', mouseHandlers.onMouseDown);
-      }
-      if (mouseHandlers?.onMouseUp) {
-        canvas.removeEventListener('mouseup', mouseHandlers.onMouseUp);
-      }
-      if (mouseHandlers?.onMouseLeave) {
-        canvas.removeEventListener('mouseleave', mouseHandlers.onMouseLeave);
-      }
+      effectCleanup();
     };
-  }, [draw, mouseHandlers]);
-  return (
-    <canvas className={className} ref={canvasRef}></canvas>
-  );
+  }, [draw, effect]);
+  return <canvas className={className} ref={canvasRef}></canvas>;
 }
 
 export default Canvas;

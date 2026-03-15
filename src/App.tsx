@@ -94,20 +94,24 @@ function App() {
     game.setEditEnabled(x);
     setEditEnabled(x);
   }, [game]);
-  const mouseHandlers = {
-    onMouseMove: useCallback((e: MouseEvent) => {
+  const canvasEffect = useCallback((canvas: HTMLCanvasElement) => {
+    const moveListener = (e: MouseEvent) =>
       game.mouseMove(e.offsetX, e.offsetY);
-    }, [game]),
-    onMouseDown: useCallback((e: MouseEvent) => {
+    const downListener = (e: MouseEvent) =>
       game.mouseDown(e.offsetX, e.offsetY);
-    }, [game]),
-    onMouseUp: useCallback(() => {
-      game.mouseUp();
-    }, [game]),
-    onMouseLeave: useCallback(() => {
-      game.mouseLeave();
-    }, [game])
-  };
+    const upListener = () => game.mouseUp();
+    const leaveListener = () => game.mouseLeave();
+    canvas.addEventListener('mousemove', moveListener);
+    canvas.addEventListener('mousedown', downListener);
+    canvas.addEventListener('mouseup', upListener);
+    canvas.addEventListener('mouseleave', leaveListener);
+    return () => {
+      canvas.removeEventListener('mousemove', moveListener);
+      canvas.removeEventListener('mousedown', downListener);
+      canvas.removeEventListener('mouseup', upListener);
+      canvas.removeEventListener('mouseleave', leaveListener);
+    };
+  }, [game]);
   useEffect(() => {
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
@@ -218,7 +222,7 @@ function App() {
         <Canvas
           draw={draw}
           className='game-canvas'
-          mouseHandlers={mouseHandlers}
+          effect={canvasEffect}
         />
         <LetterPanel
           letters={languageLetters[language]}
