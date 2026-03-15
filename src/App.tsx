@@ -163,13 +163,13 @@ function App() {
         </div>
         <Slider
           label={t('rows')}
-          list={[3, 4, 5, 6, 7, 8, 9]}
+          list={Array.from({ length: 19 }, (_, i) => 3+i)}
           value={rows}
           setValue={setRows}
         />
         <Slider
           label={t('columns')}
-          list={[3, 4, 5, 6, 7, 8, 9]}
+          list={Array.from({ length: 19 }, (_, i) => 3+i)}
           value={cols}
           setValue={setCols}
         />

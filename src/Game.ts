@@ -17,11 +17,12 @@ function drawArrow(
   y2: number
 ) {
   const a = Math.atan2(y2-y1, x2-x1);
+  const s = Math.hypot(y2-y1, x2-x1)/3;
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
-  ctx.lineTo(x2-10*Math.cos(a-Math.PI/6), y2-10*Math.sin(a-Math.PI/6));
+  ctx.lineTo(x2-s*Math.cos(a-Math.PI/6), y2-s*Math.sin(a-Math.PI/6));
   ctx.moveTo(x2, y2);
-  ctx.lineTo(x2-10*Math.cos(a+Math.PI/6), y2-10*Math.sin(a+Math.PI/6));
+  ctx.lineTo(x2-s*Math.cos(a+Math.PI/6), y2-s*Math.sin(a+Math.PI/6));
 }
 
 function drawPathArrows(

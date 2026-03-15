@@ -139,14 +139,12 @@ class Balda {
     }
     for (const language in languageWords) {
       const initWords: string[][] = [];
-        for (let i = 3; i <= 9; i++) {
-          initWords[i] = [];
-          for (const word of languageWords[language as Language]) {
-            if (word.length === i) {
-              initWords[i].push(word);
-            }
-          }
+      for (const word of languageWords[language as Language]) {
+        if (initWords[word.length] === undefined) {
+          initWords[word.length] = [];
         }
+        initWords[word.length].push(word);
+      }
       this.possibleInitWords[language] = initWords;
     }
   }

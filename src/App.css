@@ -217,7 +217,8 @@ button {
 
 fieldset {
   margin: var(--margin);
-  min-width: 160px;
+  width: 160px;
+  min-width: 0px;
   height: 120px;
   overflow: auto;
 }
