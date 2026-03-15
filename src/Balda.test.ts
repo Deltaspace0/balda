@@ -99,7 +99,7 @@ for (let i = 0; i < 1000; i++) {
     .join('\n');
   generationTests.push({ grid, word, path, gridString });
 }
-const balda = new Balda(5, 5);
+const balda = new Balda();
 balda.loadDictionary(nouns);
 afterEach(() => balda.reset());
 

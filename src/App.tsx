@@ -7,11 +7,10 @@ import FieldsetRadio from './components/FieldsetRadio';
 import LetterPanel from './components/LetterPanel';
 import Slider from './components/Slider';
 import WordList from './components/WordList';
-import Game from './Game';
+import Game, { type Language } from './Game';
 
 type WordPaths = [string, [number, number][]][];
 type Theme = 'dark' | 'light';
-type Language = 'en' | 'ru';
 const languageLetters: Record<Language, string> = {
   'en': 'abcdefghijklmnopqrstuvwxyz',
   'ru': 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
@@ -61,7 +60,7 @@ function App() {
   }, [wordHistory]);
   const gameRef = useRef<Game>(null);
   if (gameRef.current === null) {
-    const game = new Game(5, 5);
+    const game = new Game({ dimensions: [rows, cols], language });
     game.addEventListener('status', (e) => {
       setStatus((e as CustomEvent).detail);
     });
@@ -72,8 +71,6 @@ function App() {
       setPossibleWords((e as CustomEvent).detail);
     });
     game.setLetter(letter);
-    game.setLanguage(language);
-    game.setDimensions(rows, cols);
     gameRef.current = game;
   }
   const game = gameRef.current;
@@ -87,9 +84,9 @@ function App() {
   const handleLanguage = useCallback((x: Language) => {
     setLanguage(x);
     handleLetter(languageLetters[x][0]);
-    game.setLanguage(x);
+    game.setOptions({ dimensions: [rows, cols], language: x });
     i18n.changeLanguage(x);
-  }, [game, i18n, setLanguage, handleLetter]);
+  }, [game, i18n, setLanguage, handleLetter, rows, cols]);
   const handleEditEnabled = useCallback((x: boolean) => {
     game.setEditEnabled(x);
     setEditEnabled(x);

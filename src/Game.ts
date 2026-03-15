@@ -2,6 +2,13 @@ import Balda from './Balda';
 import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 import nouns from './nouns.json' with { type: 'json' };
 
+export type Language = 'en' | 'ru';
+
+interface GameOptions {
+  dimensions?: [number, number];
+  language?: Language;
+}
+
 function drawArrow(
   ctx: CanvasRenderingContext2D,
   x1: number,
@@ -82,12 +89,15 @@ class Game extends EventTarget {
   private highlightIndex: number | null = null;
   private possibleIndex: number | null = null;
 
-  constructor(rows: number, cols: number) {
+  constructor(options?: GameOptions) {
     super();
+    const [rows, cols] = options?.dimensions ?? [5, 5];
     this.rows = rows;
     this.cols = cols;
-    this.balda = new Balda(rows, cols);
+    this.balda = new Balda(options);
     this.balda.loadDictionary(nouns);
+    this.balda.reset();
+    this.resetGame();
   }
 
   private getGridCoordinates(x: number, y: number): [number, number] {
@@ -206,8 +216,16 @@ class Game extends EventTarget {
     this.resetGame();
   }
 
-  setLanguage(language: 'en' | 'ru') {
+  setLanguage(language: Language) {
     this.balda.reset(language);
+    this.resetGame();
+  }
+
+  setOptions(options: GameOptions) {
+    const [rows, cols] = options.dimensions ?? [this.rows, this.cols];
+    this.rows = rows;
+    this.cols = cols;
+    this.balda.setOptions(options);
     this.resetGame();
   }
 

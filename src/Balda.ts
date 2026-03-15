@@ -1,5 +1,11 @@
 export type Language = 'en' | 'ru';
 
+interface BaldaOptions {
+  dimensions?: [number, number];
+  language?: Language;
+  grid?: string[][]
+}
+
 interface Dictionary {
   [key: string]: Dictionary
 }
@@ -20,17 +26,19 @@ class Balda {
   possibleWordsAll: [string, [number, number][]][] = [];
   private rows: number;
   private cols: number;
-  private language: Language = 'en';
+  private language: Language;
   private dictionaries: Record<Language, Dictionary>;
   private possibleInitWords: Record<string, string[][]> = {};
   private initWord = '';
 
-  constructor(rows: number, cols: number, grid?: string[][]) {
+  constructor(options?: BaldaOptions) {
+    const [rows, cols] = options?.dimensions ?? [5, 5];
     this.rows = rows;
     this.cols = cols;
+    this.language = options?.language ?? 'en';
     this.dictionaries = { en: {}, ru: {} };
-    if (grid) {
-      this.grid = grid;
+    if (options?.grid) {
+      this.grid = options.grid;
     } else {
       this.clearGrid();
     }
@@ -172,6 +180,13 @@ class Balda {
     this.rows = rows;
     this.cols = cols;
     this.reset();
+  }
+
+  setOptions(options: BaldaOptions) {
+    const [rows, cols] = options.dimensions ?? [this.rows, this.cols];
+    this.rows = rows;
+    this.cols = cols;
+    this.reset(options.language);
   }
 
   setGrid(grid: string[][]) {

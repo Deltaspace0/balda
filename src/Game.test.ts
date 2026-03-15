@@ -7,7 +7,7 @@ const COLS = 5;
 let status = '';
 let wordHistory: [string, [number, number][]][] = [];
 let possibleWords: [string, [number, number][]][] = [];
-const game = new Game(ROWS, COLS);
+const game = new Game({ dimensions: [ROWS, COLS] });
 game.addEventListener('status', (e) => {
   status = (e as CustomEvent).detail;
 });
