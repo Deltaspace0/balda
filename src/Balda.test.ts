@@ -104,6 +104,214 @@ balda.loadDictionary(nouns);
 afterEach(() => balda.reset());
 
 describe('Balda', () => {
+  describe('dimension update', () => {
+    it('should add new empty rows evenly', () => {
+      balda.setGrid([
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([4, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([5, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.setGrid([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([4, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', '', ''],
+      ]);
+      balda.setGrid([
+        ['a', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([6, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['a', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([7, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['', '', ''],
+        ['a', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+    });
+
+    it('should add new empty columns evenly', () => {
+      balda.setGrid([
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([0, 4]);
+      expect(balda.grid).toEqual([
+        ['', '', '', ''],
+        ['b', 'o', 'x', ''],
+        ['', '', '', ''],
+      ]);
+      balda.updateDimensions([0, 5]);
+      expect(balda.grid).toEqual([
+        ['', '', '', '', ''],
+        ['', 'b', 'o', 'x', ''],
+        ['', '', '', '', ''],
+      ]);
+      balda.setGrid([
+        ['a', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+      ]);
+      balda.updateDimensions([0, 6]);
+      expect(balda.grid).toEqual([
+        ['', 'a', '', '', '', ''],
+        ['', '', '', '', '', ''],
+        ['', '', '', '', '', ''],
+      ]);
+      balda.updateDimensions([0, 7]);
+      expect(balda.grid).toEqual([
+        ['', '', 'a', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+      ]);
+    });
+
+    it('should remove empty rows evenly', () => {
+      balda.setGrid([
+        ['', '', ''],
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([4, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([3, 0]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', '']
+      ]);
+      balda.setGrid([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([2, 0]);
+      expect(balda.grid).toEqual([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+      ]);
+    });
+
+    it('should remove empty columns evenly', () => {
+      balda.setGrid([
+        ['', '', '', '', ''],
+        ['', 'b', 'o', 'x', ''],
+        ['', '', '', '', ''],
+      ]);
+      balda.updateDimensions([0, 4]);
+      expect(balda.grid).toEqual([
+        ['', '', '', ''],
+        ['b', 'o', 'x', ''],
+        ['', '', '', ''],
+      ]);
+      balda.updateDimensions([0, 3]);
+      expect(balda.grid).toEqual([
+        ['', '', ''],
+        ['b', 'o', 'x'],
+        ['', '', '']
+      ]);
+    });
+
+    it('should not remove rows with letters', () => {
+      balda.setGrid([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', 'a', ''],
+        ['', 'd', '']
+      ]);
+      balda.updateDimensions([3, 0]);
+      expect(balda.grid).toEqual([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', 'a', ''],
+        ['', 'd', '']
+      ]);
+    });
+
+    it('should not remove columns with letters', () => {
+      balda.setGrid([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', 'a', ''],
+        ['', 'd', '']
+      ]);
+      balda.updateDimensions([0, 2]);
+      expect(balda.grid).toEqual([
+        ['', 't', ''],
+        ['b', 'o', 'x'],
+        ['', 'a', ''],
+        ['', 'd', '']
+      ]);
+    });
+
+    it('should update dimensions of empty grid', () => {
+      balda.setGrid([
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]);
+      balda.updateDimensions([5, 2]);
+      expect(balda.grid).toEqual([
+        ['', ''],
+        ['', ''],
+        ['', ''],
+        ['', ''],
+        ['', '']
+      ]);
+      balda.updateDimensions([3, 4]);
+      expect(balda.grid).toEqual([
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['', '', '', ''],
+      ]);
+    });
+  });
+
   describe('check', () => {
     it('should return false for a made-up word', () => {
       expect(balda.checkWord('notaword')).toBe(false);

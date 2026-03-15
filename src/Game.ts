@@ -208,6 +208,13 @@ class Game extends EventTarget {
     this.resetGame();
   }
 
+  updateDimensions(dimensions: [number, number]) {
+    const [rows, cols] = this.balda.updateDimensions(dimensions);
+    this.rows = rows;
+    this.cols = cols;
+    this.update();
+  }
+
   setDimensions(rows: number, cols: number) {
     this.rows = rows;
     this.cols = cols;

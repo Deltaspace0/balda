@@ -78,6 +78,14 @@ function App() {
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     game.render(ctx, theme === 'dark');
   }, [game, theme]);
+  const handleRows = useCallback((x: number) => {
+    setRows(x);
+    game.updateDimensions([x, 0]);
+  }, [game, setRows]);
+  const handleCols = useCallback((x: number) => {
+    setCols(x);
+    game.updateDimensions([0, x]);
+  }, [game, setCols]);
   const handleLetter = useCallback((x: string) => {
     game.setLetter(x);
     setLetter(x);
@@ -165,13 +173,13 @@ function App() {
           label={t('rows')}
           list={Array.from({ length: 19 }, (_, i) => 3+i)}
           value={rows}
-          setValue={setRows}
+          setValue={handleRows}
         />
         <Slider
           label={t('columns')}
           list={Array.from({ length: 19 }, (_, i) => 3+i)}
           value={cols}
-          setValue={setCols}
+          setValue={handleCols}
         />
         <label>
           <input

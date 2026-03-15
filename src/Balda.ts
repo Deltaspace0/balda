@@ -174,6 +174,114 @@ class Balda {
     }
   }
 
+  addTopRow() {
+    this.rows++;
+    this.grid.unshift(Array(this.cols).fill(''));
+  }
+
+  addBottomRow() {
+    this.rows++;
+    this.grid.push(Array(this.cols).fill(''));
+  }
+
+  addLeftColumn() {
+    this.cols++;
+    this.grid.forEach((row) => row.unshift(''));
+  }
+
+  addRightColumn() {
+    this.cols++;
+    this.grid.forEach((row) => row.push(''));
+  }
+
+  removeTopRow() {
+    if (this.rows > 1) {
+      this.rows--;
+      this.grid.shift();
+    }
+  }
+
+  removeBottomRow() {
+    if (this.rows > 1) {
+      this.rows--;
+      this.grid.pop();
+    }
+  }
+
+  removeLeftColumn() {
+    if (this.cols > 1) {
+      this.cols--;
+      this.grid.forEach((row) => row.shift());
+    }
+  }
+
+  removeRightColumn() {
+    if (this.cols > 1) {
+      this.cols--;
+      this.grid.forEach((row) => row.pop());
+    }
+  }
+
+  updateDimensions([rows, cols]: [number, number]): [number, number] {
+    let minRow = this.rows;
+    let maxRow = -1;
+    let minCol = this.cols;
+    let maxCol = -1;
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        if (this.grid[i][j]) {
+          minRow = Math.min(i, minRow);
+          maxRow = Math.max(i, maxRow);
+          minCol = Math.min(j, minCol);
+          maxCol = Math.max(j, maxCol);
+        }
+      }
+    }
+    rows = rows ? Math.max(maxRow-minRow+1, rows) : this.rows;
+    cols = cols ? Math.max(maxCol-minCol+1, cols) : this.cols;
+    let top = 0;
+    let bottom = this.rows;
+    let left = 0;
+    let right = this.cols;
+    while (rows > this.rows) {
+      if (minRow-top < bottom-maxRow-1) {
+        this.addTopRow();
+        top--;
+      } else {
+        this.addBottomRow();
+        bottom++;
+      }
+    }
+    while (cols > this.cols) {
+      if (minCol-left < right-maxCol-1) {
+        this.addLeftColumn();
+        left--;
+      } else {
+        this.addRightColumn();
+        right++;
+      }
+    }
+    while (rows < this.rows) {
+      if (minRow-top < bottom-maxRow-1) {
+        this.removeBottomRow();
+        bottom--;
+      } else {
+        this.removeTopRow();
+        top++;
+      }
+    }
+    while (cols < this.cols) {
+      if (minCol-left < right-maxCol-1) {
+        this.removeRightColumn();
+        right--;
+      } else {
+        this.removeLeftColumn();
+        left++;
+      }
+    }
+    return [this.rows, this.cols];
+  }
+
   setDimensions(rows: number, cols: number) {
     this.rows = rows;
     this.cols = cols;
