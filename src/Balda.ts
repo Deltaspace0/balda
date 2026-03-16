@@ -296,12 +296,19 @@ class Balda {
   }
 
   setGrid(grid: string[][]) {
-    if (!this.grid.length || !this.grid[0].length) {
+    if (!grid.length || !grid[0].length) {
       throw new Error('Invalid grid');
     }
+    const rows = grid.length;
+    const cols = grid[0].length;
+    for (const row of grid) {
+      if (row.length !== cols) {
+        throw new Error('Invalid grid');
+      }
+    }
     this.grid = grid;
-    this.rows = this.grid.length;
-    this.cols = this.grid[0].length;
+    this.rows = rows;
+    this.cols = cols;
   }
 
   update() {

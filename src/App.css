@@ -189,6 +189,14 @@ input[type="range"] {
   }
 }
 
+input[type="text"] {
+  margin: var(--margin);
+  padding: 4px;
+  background: var(--element-bg);
+  color: var(--main);
+  border: 1px solid var(--border);
+}
+
 button {
   font-size: 12px;
   width: 100%;

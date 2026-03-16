@@ -40,6 +40,7 @@ function App() {
   const [possibleWords, setPossibleWords] = useState<WordPaths>([]);
   const [rows, setRows] = useStorage('rows', 5);
   const [cols, setCols] = useStorage('cols', 5);
+  const [gridString, setGridString] = useState('');
   const { t, i18n } = useTranslation('translation', { lng: language });
   const [wordHistory1, wordHistory2, score1, score2] = useMemo(() => {
     const wordHistory1: WordPaths = [];
@@ -70,6 +71,9 @@ function App() {
     game.addEventListener('possible-words', (e) => {
       setPossibleWords((e as CustomEvent).detail);
     });
+    game.addEventListener('grid-string', (e) => {
+      setGridString((e as CustomEvent).detail);
+    });
     game.setLetter(letter);
     game.reset();
     gameRef.current = game;
@@ -78,6 +82,10 @@ function App() {
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     game.render(ctx, theme === 'dark');
   }, [game, theme]);
+  const handleGridString = useCallback((x: string) => {
+    setGridString(x);
+    game.setGridString(x);
+  }, [game]);
   const handleRows = useCallback((x: number) => {
     setRows(x);
     game.updateDimensions([x, 0]);
@@ -189,8 +197,15 @@ function App() {
           />
           <p>{t('edit-mode')}</p>
         </label>
-        { editEnabled && <div className='flex-row'>
-          <button onClick={() => game.clear()}>{t('clear')}</button>
+        { editEnabled && <div className='flex-column'>
+          <input
+            type='text'
+            value={gridString}
+            onChange={(e) => handleGridString(e.target.value)}
+          />
+          <div className='flex-row'>
+            <button onClick={() => game.clear()}>{t('clear')}</button>
+          </div>
         </div> }
         <label>
           <input

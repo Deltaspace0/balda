@@ -116,6 +116,10 @@ class Game extends EventTarget {
       .sort(([word1], [word2]) => word2.length-word1.length);
     this.balda.possibleWords = possibleWords;
     this.emitEvent('possible-words', [...possibleWords]);
+    const gridString = this.balda.grid
+      .map((row) => row.map((x) => x === '' ? '.' : x).join(''))
+      .join('/');
+    this.emitEvent('grid-string', gridString);
   }
 
   private isUnique(word: string): boolean {
@@ -225,6 +229,25 @@ class Game extends EventTarget {
   setLanguage(language: Language) {
     this.balda.reset(language);
     this.resetGame();
+  }
+
+  setGridString(gridString: string) {
+    const newGrid: string[][] = [];
+    for (const rowString of gridString.split('/')) {
+      const row: string[] = [];
+      for (const i of rowString) {
+        row.push(i === '.' ? '' : i);
+      }
+      newGrid.push(row);
+    }
+    try {
+      this.balda.setGrid(newGrid);
+      this.rows = newGrid.length;
+      this.cols = newGrid[0].length;
+      this.update();
+    } catch {
+      console.error('Invalid grid string: '+gridString);
+    }
   }
 
   setOptions(options: GameOptions) {
