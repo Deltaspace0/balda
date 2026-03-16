@@ -96,7 +96,7 @@ for (let i = 0; i < 1000; i++) {
   grid[holeRow][holeCol] = '';
   const gridString = grid
     .map((row) => row.map((x) => !x ? '.' : x).join(''))
-    .join('\n');
+    .join('/');
   generationTests.push({ grid, word, path, gridString });
 }
 const balda = new Balda();
