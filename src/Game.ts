@@ -226,6 +226,10 @@ class Game extends EventTarget {
     this.resetGame();
   }
 
+  getDimensions(): [number, number] {
+    return [this.rows, this.cols];
+  }
+
   setLanguage(language: Language) {
     this.balda.reset(language);
     this.resetGame();

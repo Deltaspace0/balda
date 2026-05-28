@@ -85,7 +85,10 @@ function App() {
   const handleGridString = useCallback((x: string) => {
     setGridString(x);
     game.setGridString(x);
-  }, [game]);
+    const [newRows, newCols] = game.getDimensions();
+    setRows(newRows);
+    setCols(newCols);
+  }, [game, setRows, setCols]);
   const handleRows = useCallback((x: number) => {
     setRows(x);
     game.updateDimensions([x, 0]);
