@@ -242,7 +242,10 @@ function App() {
           }}
         /> }
       </div>
-      <div className='flex-column'>
+      <div
+        className='flex-column'
+        style={{alignItems: 'center', minWidth: 400}}
+      >
         <Canvas
           draw={draw}
           className='game-canvas'

@@ -21,6 +21,7 @@
   --element-transform: scale(1.2);
   --margin: 4px;
   --size-element: 16px;
+  --canvas-size: max(200px, min(calc(100vw - 400px), 60vh));
 }
 
 * {
@@ -307,7 +308,7 @@ p {
 
 .game-canvas {
   position: relative;
-  width: 400px;
-  height: 400px;
+  width: var(--canvas-size);
+  height: var(--canvas-size);
   margin: var(--margin);
 }

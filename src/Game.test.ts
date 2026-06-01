@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import Game from './Game';
-import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 
 const ROWS = 5;
 const COLS = 5;
@@ -24,8 +23,8 @@ afterEach(() => {
 });
 
 function getScreenCoordinates(row: number, col: number) {
-  const x = (col+Math.random())/COLS*GAME_WIDTH;
-  const y = (row+Math.random())/ROWS*GAME_HEIGHT;
+  const x = (col+Math.random())/COLS*400;
+  const y = (row+Math.random())/ROWS*400;
   return [x, y];
 }
 

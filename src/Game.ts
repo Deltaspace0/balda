@@ -1,5 +1,4 @@
 import Balda from './Balda';
-import { GAME_WIDTH, GAME_HEIGHT } from './gameConfig';
 import nouns from './nouns.json' with { type: 'json' };
 
 export type Language = 'en' | 'ru';
@@ -75,6 +74,8 @@ function drawPathCells(
 }
 
 class Game extends EventTarget {
+  private canvasWidth = 400;
+  private canvasHeight = 400;
   private rows: number;
   private cols: number;
   private balda: Balda;
@@ -100,8 +101,8 @@ class Game extends EventTarget {
   }
 
   private getGridCoordinates(x: number, y: number): [number, number] {
-    const row = Math.floor(y/GAME_HEIGHT*this.rows);
-    const col = Math.floor(x/GAME_WIDTH*this.cols);
+    const row = Math.floor(y/this.canvasHeight*this.rows);
+    const col = Math.floor(x/this.canvasWidth*this.cols);
     return [row, col];
   }
 
@@ -429,10 +430,12 @@ class Game extends EventTarget {
   }
 
   render(ctx: CanvasRenderingContext2D, darkMode?: boolean) {
+    this.canvasWidth = ctx.canvas.clientWidth;
+    this.canvasHeight = ctx.canvas.clientHeight;
     ctx.fillStyle = darkMode ? '#111' : '#eee';
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    const dw = GAME_WIDTH/this.cols;
-    const dh = GAME_HEIGHT/this.rows;
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+    const dw = this.canvasWidth/this.cols;
+    const dh = this.canvasHeight/this.rows;
     ctx.font = `${Math.floor(Math.min(dw, dh)*0.6)}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -483,16 +486,17 @@ class Game extends EventTarget {
         drawPathArrows(ctx, path, dw, dh);
       }
     }
-    for (let i = 0; i < this.rows+1; i++) {
+    ctx.strokeRect(1, 1, this.canvasWidth-2, this.canvasHeight-2);
+    for (let i = 1; i < this.rows; i++) {
       ctx.beginPath();
       ctx.moveTo(0, dh*i);
-      ctx.lineTo(GAME_WIDTH, dh*i);
+      ctx.lineTo(this.canvasWidth, dh*i);
       ctx.stroke();
     }
-    for (let i = 0; i < this.cols+1; i++) {
+    for (let i = 1; i < this.cols; i++) {
       ctx.beginPath();
       ctx.moveTo(dw*i, 0);
-      ctx.lineTo(dw*i, GAME_HEIGHT);
+      ctx.lineTo(dw*i, this.canvasHeight);
       ctx.stroke();
     }
     for (let i = 0; i < this.rows; i++) {

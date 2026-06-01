@@ -18,13 +18,15 @@ function Canvas({ draw, className, effect }: CanvasProps) {
     if (!ctx) {
       return;
     }
-    const dpr = window.devicePixelRatio;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
-    ctx.scale(dpr, dpr);
+    const resizeListener = () => {
+      const dpr = window.devicePixelRatio;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width*dpr;
+      canvas.height = rect.height*dpr;
+      ctx.scale(dpr, dpr);
+      draw(ctx, 0);
+    };
+    resizeListener();
     let animationFrameId: number;
     const render = (time: number) => {
       time /= 1000;
@@ -38,8 +40,13 @@ function Canvas({ draw, className, effect }: CanvasProps) {
     if (effect) {
       effectCleanup = effect(canvas);
     }
+    const resizeObserver = new ResizeObserver(() => {
+      resizeListener();
+    });
+    resizeObserver.observe(canvas);
     return () => {
       window.cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
       effectCleanup();
     };
   }, [draw, effect]);
